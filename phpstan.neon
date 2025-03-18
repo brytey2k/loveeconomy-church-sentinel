@@ -1,0 +1,15 @@
+parameters:
+    paths:
+        - app
+        - tests
+
+    # Level 9 is the highest level
+    level: 1
+
+    checkUninitializedProperties: false # consider set it to true after increasing level to max
+#    checkModelProperties: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkFunctionNameCase: true
+    checkInternalClassCaseSensitivity: true
+
+    ignoreErrors:
