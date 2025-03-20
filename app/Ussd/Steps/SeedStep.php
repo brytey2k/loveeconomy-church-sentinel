@@ -6,6 +6,7 @@ namespace App\Ussd\Steps;
 
 use App\Dto\UssdInteractionRequestDto;
 use App\Enums\UssdAction;
+use App\Enums\UssdResponseType;
 use App\Enums\UssdStepKey;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
@@ -13,6 +14,11 @@ use App\Ussd\Option;
 
 class SeedStep extends BaseStep implements UssdStepInterface
 {
+    public function __construct(
+        protected AmountStep $amountStep
+    ) {
+    }
+
     public function handle(UssdInteractionRequestDto $requestDto, string|null $message = null, bool $replace = false): mixed
     {
         $message = 'Enter month and year of payment';
@@ -20,7 +26,7 @@ class SeedStep extends BaseStep implements UssdStepInterface
         return SuccessResponse::make(
             data: [
                 'SessionId' => $requestDto->sessionId,
-                'Type' => 'response',
+                'Type' => UssdResponseType::RESPONSE->value,
                 'Message' => $message,
                 'Label' => $this->getKey()->getLabel(),
                 'ClientState' => $requestDto->clientState
@@ -46,9 +52,9 @@ class SeedStep extends BaseStep implements UssdStepInterface
 
     public function getSelectedOption(int $key): Option
     {
-        // todo: finish tithe steps
+        // todo: finish seed steps
         // return option that leads to next step
-        return new Option(1, 'Amount', new AmountStep());
+        return new Option(1, 'Amount', $this->amountStep);
     }
 
     public function getAction(): UssdAction
