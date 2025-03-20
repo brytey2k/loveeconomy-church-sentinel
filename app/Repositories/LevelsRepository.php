@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Dto\CreateLevelDto;
@@ -25,8 +27,10 @@ class LevelsRepository
         return Level::where('position', $position)->exists();
     }
 
-
     /**
+     * @param Level $level
+     * @param UpdateLevelDto $updateLevelDto
+     *
      * @throws LevelPositionAlreadyExistsException
      */
     public function update(Level $level, UpdateLevelDto $updateLevelDto): Level

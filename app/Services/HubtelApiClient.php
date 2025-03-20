@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use GuzzleHttp\Promise\PromiseInterface;
@@ -18,6 +20,9 @@ class HubtelApiClient
     }
 
     /**
+     * @param string $sessionId
+     * @param string $orderId
+     *
      * @throws ConnectionException
      */
     public function sendServiceFulfilmentRequest(string $sessionId, string $orderId): PromiseInterface|Response

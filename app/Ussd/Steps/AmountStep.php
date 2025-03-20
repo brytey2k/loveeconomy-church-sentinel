@@ -13,6 +13,7 @@ use App\Http\Requests\UssdInteractionRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
 use App\Repositories\UssdTransactionDataRepository;
+use App\Ussd\Contracts\BaseStep;
 use App\Ussd\Option;
 use Exception;
 
@@ -35,10 +36,10 @@ class AmountStep extends BaseStep implements UssdStepInterface
                 'SessionId' => $requestDto->sessionId,
                 'Type' => UssdResponseType::RESPONSE->value,
                 'Message' => 'Enter Amount',
-                'Label' => $this->getKey()->getLabel(),
+                'Label' => static::getKey()->getLabel(),
                 'ClientState' => $requestDto->clientState
-                    ? sprintf('%s/%s', $requestDto->clientState, $this->getKey()->value)
-                    : $this->getKey()->value,
+                    ? sprintf('%s/%s', $requestDto->clientState, static::getKey()->value)
+                    : static::getKey()->value,
                 'DataType' => 'input',
                 'FieldType' => 'text',
             ],
@@ -52,7 +53,7 @@ class AmountStep extends BaseStep implements UssdStepInterface
         return $this->options;
     }
 
-    public function getKey(): UssdStepKey
+    public static function getKey(): UssdStepKey
     {
         return UssdStepKey::AMOUNT;
     }

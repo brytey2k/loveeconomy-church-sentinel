@@ -11,18 +11,13 @@ use App\Exceptions\MissingStepException;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
 use App\Repositories\UssdSessionRepository;
-use App\Ussd\Steps\AmountStep;
-use App\Ussd\Steps\BaseStep;
-use App\Ussd\Steps\PartnershipMonthStep;
-use App\Ussd\Steps\PartnershipYearStep;
-use App\Ussd\Steps\SeedStep;
-use App\Ussd\Steps\SendPaymentPromptStep;
-use App\Ussd\Steps\TitheMonthStep;
-use App\Ussd\Steps\TitheYearStep;
-use App\Ussd\Steps\WelcomeStep;
+use App\Ussd\Contracts\BaseStep;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use ReflectionClass;
 
 class UssdService
 {
@@ -33,39 +28,38 @@ class UssdService
 
     public function __construct(
         protected UssdSessionRepository $ussdSessionRepository,
-        WelcomeStep $welcomeStep,
-        TitheMonthStep $titheMonthStep,
-        TitheYearStep $titheYearStep,
-        SeedStep $seedStep,
-        SendPaymentPromptStep $sendPaymentPromptStep,
-        AmountStep $amountStep,
-        PartnershipMonthStep $partnershipMonthStep,
-        PartnershipYearStep $partnershipYearStep
     ) {
-        $this->registerStep($welcomeStep)
-            ->registerStep($titheMonthStep)
-            ->registerStep($titheYearStep)
-            ->registerStep($seedStep)
-            ->registerStep($sendPaymentPromptStep)
-            ->registerStep($amountStep)
-            ->registerStep($partnershipMonthStep)
-            ->registerStep($partnershipYearStep);
-        // Register other steps here
+        $this->registerUssdStepClasses();
     }
 
-    protected function registerStep(UssdStepInterface $step): static
+    protected function registerUssdStepClasses(): void
     {
-        $this->steps[$step->getKey()->value] = $step::class;
-        return $this;
+        $stepsPath = app_path('Ussd/Steps');
+        $stepFiles = File::allFiles($stepsPath);
+        $stepClasses = [];
+
+        foreach ($stepFiles as $file) {
+            $className = 'App\\Ussd\\Steps\\' . $file->getFilenameWithoutExtension();
+            if (class_exists($className)) {
+                $reflection = new ReflectionClass($className);
+                if ($reflection->implementsInterface('App\\Interfaces\\UssdStepInterface') && !$reflection->isAbstract()) {
+                    $stepClasses[] = $className;
+                }
+            }
+        }
+
+        foreach ($stepClasses as $stepClass) {
+            $this->steps[$stepClass::getKey()->value] = $stepClass;
+        }
     }
 
     /**
      * @param UssdInteractionRequestDto $requestDto
      *
-     * @return SuccessResponse
-     *@throws MissingStepException
-     *
+     * @throws MissingStepException
      * @throws BindingResolutionException
+     *
+     * @return SuccessResponse
      */
     public function processRequest(UssdInteractionRequestDto $requestDto): SuccessResponse
     {
@@ -85,15 +79,17 @@ class UssdService
      * @param string $currentStep
      * @param UssdInteractionRequestDto $requestDto
      *
-     * @return SuccessResponse
-     *@throws MissingStepException
-     *
+     * @throws MissingStepException
      * @throws BindingResolutionException
+     *
+     * @return SuccessResponse
      */
     protected function handleStep(string $currentStep, UssdInteractionRequestDto $requestDto): SuccessResponse
     {
         if (isset($this->steps[$currentStep])) {
             $stepClass = $this->steps[$currentStep];
+
+            Log::info('Handling step', ['step' => $stepClass]);
 
             /** @var UssdStepInterface&BaseStep $stepInstance */
             $stepInstance = Application::getInstance()->make($stepClass);

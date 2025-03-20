@@ -10,7 +10,6 @@ use App\Enums\UssdStepKey;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
 use App\Ussd\Option;
-use App\Ussd\Steps\BaseStep;
 
 abstract class MonthStep extends BaseStep implements UssdStepInterface
 {
@@ -25,10 +24,10 @@ abstract class MonthStep extends BaseStep implements UssdStepInterface
                 'SessionId' => $requestDto->sessionId,
                 'Type' => 'response',
                 'Message' => $message,
-                'Label' => $this->getKey()->getLabel(),
+                'Label' => static::getKey()->getLabel(),
                 'ClientState' => $requestDto->clientState
-                    ? sprintf('%s/%s', $requestDto->clientState, $this->getKey()->value)
-                    : $this->getKey()->value,
+                    ? sprintf('%s/%s', $requestDto->clientState, static::getKey()->value)
+                    : static::getKey()->value,
                 'DataType' => 'input',
                 'FieldType' => 'text',
             ],
@@ -42,7 +41,7 @@ abstract class MonthStep extends BaseStep implements UssdStepInterface
         return $this->options;
     }
 
-    abstract public function getKey(): UssdStepKey;
+    abstract public static function getKey(): UssdStepKey;
 
     abstract public function getSelectedOption(int $key): Option;
 

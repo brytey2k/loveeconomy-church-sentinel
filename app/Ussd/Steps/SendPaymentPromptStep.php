@@ -13,6 +13,7 @@ use App\Http\Requests\UssdInteractionRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
 use App\Repositories\UssdTransactionDataRepository;
+use App\Ussd\Contracts\BaseStep;
 use App\Ussd\Option;
 
 class SendPaymentPromptStep extends BaseStep implements UssdStepInterface
@@ -40,7 +41,7 @@ class SendPaymentPromptStep extends BaseStep implements UssdStepInterface
                     'Qty' => 1,
                     'Price' => $txData->tx_data[UssdDataKey::AMOUNT->value],
                 ],
-                'Label' => $this->getKey()->getLabel(),
+                'Label' => static::getKey()->getLabel(),
                 'DataType' => 'display',
                 'FieldType' => 'text',
             ],
@@ -54,7 +55,7 @@ class SendPaymentPromptStep extends BaseStep implements UssdStepInterface
         return $this->options;
     }
 
-    public function getKey(): UssdStepKey
+    public static function getKey(): UssdStepKey
     {
         return UssdStepKey::PROMPT;
     }

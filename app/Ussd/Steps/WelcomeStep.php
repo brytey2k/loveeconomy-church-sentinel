@@ -15,6 +15,7 @@ use App\Http\Requests\UssdInteractionRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
 use App\Repositories\UssdTransactionDataRepository;
+use App\Ussd\Contracts\BaseStep;
 use App\Ussd\Option;
 
 class WelcomeStep extends BaseStep implements UssdStepInterface
@@ -56,10 +57,10 @@ class WelcomeStep extends BaseStep implements UssdStepInterface
                 'SessionId' => $requestDto->sessionId,
                 'Type' => UssdResponseType::RESPONSE->value,
                 'Message' => $message,
-                'Label' => $this->getKey()->getLabel(),
+                'Label' => static::getKey()->getLabel(),
                 'ClientState' => $requestDto->clientState
-                    ? sprintf('%s/%s', $requestDto->clientState, $this->getKey()->value)
-                    : $this->getKey()->value,
+                    ? sprintf('%s/%s', $requestDto->clientState, static::getKey()->value)
+                    : static::getKey()->value,
                 'DataType' => 'input',
                 'FieldType' => 'text',
             ],
@@ -73,7 +74,7 @@ class WelcomeStep extends BaseStep implements UssdStepInterface
         return $this->options;
     }
 
-    public function getKey(): UssdStepKey
+    public static function getKey(): UssdStepKey
     {
         return UssdStepKey::WELCOME;
     }
@@ -85,6 +86,10 @@ class WelcomeStep extends BaseStep implements UssdStepInterface
 
         $options = $this->getOptions();
         foreach ($options as $option) {
+            if ($option->getKey() !== $key) {
+                continue;
+            }
+
             $this->ussdTransactionDataRepository->update(
                 ussdTransactionData: $txData,
                 data: [

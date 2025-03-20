@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions;
 
 use App\Dto\CreateMemberDto;
@@ -117,8 +119,12 @@ class ServiceFulfilment
             paidThrough: PaymentProvider::HUBTEL,
             orderId: $this->request->string('OrderInfo.OrderId')->toString(),
             paymentType: $this->request->string('OrderInfo.PaymentType')->toString(),
-            monthPaidFor: (int) $ussdTxData->tx_data[UssdDataKey::MONTH->value] ?? now()->format('m'),
-            yearPaidFor: (int) $ussdTxData->tx_data[UssdDataKey::YEAR->value] ?? now()->format('Y'),
+            monthPaidFor: (int) isset($ussdTxData->tx_data[UssdDataKey::MONTH->value])
+                ? $ussdTxData->tx_data[UssdDataKey::MONTH->value]
+                : now()->format('m'),
+            yearPaidFor: (int) isset($ussdTxData->tx_data[UssdDataKey::YEAR->value])
+                ? $ussdTxData->tx_data[UssdDataKey::YEAR->value]
+                : now()->format('Y'),
         ));
 
         Log::info('Transaction created', [

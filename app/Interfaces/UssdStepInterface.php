@@ -19,7 +19,7 @@ interface UssdStepInterface
      * @return array<Option>
      */
     public function getOptions(): array;
-    public function getKey(): UssdStepKey;
+    public static function getKey(): UssdStepKey;
 
     /**
      * @param int $key

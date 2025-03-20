@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateLevelRequest;
@@ -7,7 +9,6 @@ use App\Http\Requests\UpdateLevelRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Level;
 use App\Repositories\LevelsRepository;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LevelsController extends Controller
@@ -50,6 +51,8 @@ class LevelsController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param Level $level
      */
     public function destroy(Level $level)
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Ussd\Steps;
+namespace App\Ussd\Contracts;
 
 use App\Dto\UssdInteractionRequestDto;
 use App\Exceptions\DuplicateOptionKeysException;
@@ -44,6 +44,9 @@ abstract class BaseStep
         return $this;
     }
 
+    /**
+     * @return array<Option>
+     */
     abstract public function getOptions(): array;
 
     final public function isInitiationStep(UssdInteractionRequestDto $requestDto): bool

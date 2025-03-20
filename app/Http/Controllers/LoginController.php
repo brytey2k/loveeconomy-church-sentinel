@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ApiLoginRequest;
@@ -7,7 +9,6 @@ use App\Http\Responses\SuccessResponse;
 use App\Http\Responses\UnauthenticatedResponse;
 use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller

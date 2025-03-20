@@ -37,10 +37,10 @@ class PartnershipMonthStep extends MonthStep
                 'SessionId' => $requestDto->sessionId,
                 'Type' => 'response',
                 'Message' => $message,
-                'Label' => $this->getKey()->getLabel(),
+                'Label' => static::getKey()->getLabel(),
                 'ClientState' => $requestDto->clientState
-                    ? sprintf('%s/%s', $requestDto->clientState, $this->getKey()->value)
-                    : $this->getKey()->value,
+                    ? sprintf('%s/%s', $requestDto->clientState, static::getKey()->value)
+                    : static::getKey()->value,
                 'DataType' => 'input',
                 'FieldType' => 'text',
             ],
@@ -54,7 +54,7 @@ class PartnershipMonthStep extends MonthStep
         return $this->options;
     }
 
-    public function getKey(): UssdStepKey
+    public static function getKey(): UssdStepKey
     {
         return UssdStepKey::PARTNERSHIP_MONTH;
     }

@@ -8,6 +8,7 @@ use App\Dto\UssdInteractionRequestDto;
 use App\Enums\UssdAction;
 use App\Enums\UssdStepKey;
 use App\Interfaces\UssdStepInterface;
+use App\Ussd\Contracts\BaseStep;
 use App\Ussd\Option;
 
 class OfferingStep extends BaseStep implements UssdStepInterface
@@ -20,7 +21,7 @@ class OfferingStep extends BaseStep implements UssdStepInterface
     public function handle(UssdInteractionRequestDto $requestDto, string|null $message = null, bool $replace = false): mixed
     {
         // append offering action to client state and proxy this to the amount step
-        $requestDto->clientState = sprintf('%s/%s', $requestDto->clientState, $this->getKey()->value);
+        $requestDto->clientState = sprintf('%s/%s', $requestDto->clientState, static::getKey()->value);
         return $this->amountStep->handle($requestDto);
     }
 
@@ -29,7 +30,7 @@ class OfferingStep extends BaseStep implements UssdStepInterface
         return $this->options;
     }
 
-    public function getKey(): UssdStepKey
+    public static function getKey(): UssdStepKey
     {
         return UssdStepKey::OFFERING;
     }

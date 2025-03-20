@@ -10,6 +10,7 @@ use App\Enums\UssdResponseType;
 use App\Enums\UssdStepKey;
 use App\Http\Responses\SuccessResponse;
 use App\Interfaces\UssdStepInterface;
+use App\Ussd\Contracts\BaseStep;
 use App\Ussd\Option;
 
 class SeedStep extends BaseStep implements UssdStepInterface
@@ -28,10 +29,10 @@ class SeedStep extends BaseStep implements UssdStepInterface
                 'SessionId' => $requestDto->sessionId,
                 'Type' => UssdResponseType::RESPONSE->value,
                 'Message' => $message,
-                'Label' => $this->getKey()->getLabel(),
+                'Label' => static::getKey()->getLabel(),
                 'ClientState' => $requestDto->clientState
-                    ? sprintf('%s/%s', $requestDto->clientState, $this->getKey()->value)
-                    : $this->getKey()->value,
+                    ? sprintf('%s/%s', $requestDto->clientState, static::getKey()->value)
+                    : static::getKey()->value,
                 'DataType' => 'input',
                 'FieldType' => 'text',
             ],
@@ -45,7 +46,7 @@ class SeedStep extends BaseStep implements UssdStepInterface
         return $this->options;
     }
 
-    public function getKey(): UssdStepKey
+    public static function getKey(): UssdStepKey
     {
         return UssdStepKey::SEED;
     }

@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\ServiceFulfilment;
-use App\Dto\CreateMemberDto;
-use App\Dto\CreateTransactionDto;
-use App\Enums\PaymentProvider;
-use App\Enums\TransactionState;
-use App\Enums\UssdAction;
-use App\Enums\UssdDataKey;
 use App\Exceptions\MissingStepException;
 use App\Http\Requests\UssdFulfillmentRequest;
 use App\Http\Requests\UssdInteractionRequest;
@@ -23,8 +17,6 @@ use App\Services\UssdService;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class UssdController extends Controller
 {
@@ -41,10 +33,10 @@ class UssdController extends Controller
     /**
      * @param UssdInteractionRequest $request
      *
-     * @return SuccessResponse
      * @throws MissingStepException
-     *
      * @throws BindingResolutionException
+     *
+     * @return SuccessResponse
      */
     public function interact(UssdInteractionRequest $request): JsonResponse
     {
