@@ -7,7 +7,6 @@ namespace Tests\Contract;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
