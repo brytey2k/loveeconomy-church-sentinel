@@ -51,7 +51,7 @@ class RefreshTokenController extends Controller
         return SuccessResponse::make(data: [
             'access_token' => $newAccessToken,
             'expires_in' => 900, // 15 minutes
-            'expires_at' => now()->addMinutes(15)->toIso8601String(),
+            'expires_at' => now()->addMinutes(15)->toDateTimeString(),
             'refresh_token' => $request->bearerToken(),
         ]);
     }

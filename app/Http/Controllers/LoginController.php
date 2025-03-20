@@ -29,14 +29,14 @@ class LoginController extends Controller
         }
 
         // Generate tokens
-        $accessToken = $user->createToken('access_token', ['*'], now()->addMinutes(15))->plainTextToken;
-        $refreshToken = $user->createToken('refresh_token', ['refresh'], now()->addDays(7))->plainTextToken;
+        $accessToken = $user->createToken('access_token', [], now()->addSeconds(UserRepositoryInterface::ACCESS_TOKEN_LIFETIME_IN_SECONDS))->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', ['refresh'], now()->addSeconds(UserRepositoryInterface::REFRESH_TOKEN_LIFETIME_IN_SECONDS))->plainTextToken;
 
         return SuccessResponse::make(data: [
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
             'expires_in' => 900, // 15 minutes
-            'expires_at' => now()->addMinutes(15)->toIso8601String(),
+            'expires_at' => now()->addMinutes(15)->toDateTimeString(),
         ]);
     }
 }
