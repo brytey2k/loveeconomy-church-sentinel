@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Structure;
 
-use App\Http\Requests\CreateLevelRequest;
-use App\Http\Requests\UpdateLevelRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Structure\Levels\CreateLevelRequest;
+use App\Http\Requests\Structure\Levels\UpdateLevelRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Level;
-use App\Repositories\LevelsRepository;
+use App\Repositories\Structure\LevelsRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 class LevelsController extends Controller

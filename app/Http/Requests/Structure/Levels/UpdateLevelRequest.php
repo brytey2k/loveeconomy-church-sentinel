@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Structure\Levels;
 
-use App\Dto\UpdateLevelDto;
+use App\Dto\Structure\Levels\UpdateLevelDto;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 

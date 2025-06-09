@@ -114,4 +114,6 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'access_token_lifetime_in_seconds' => (int) env('ACCESS_TOKEN_LIFETIME_IN_SECONDS', 900), // 15 minutes
+    'refresh_token_lifetime_in_seconds' => (int) env('REFRESH_TOKEN_LIFETIME_IN_SECONDS', 604800), // 7 days
 ];

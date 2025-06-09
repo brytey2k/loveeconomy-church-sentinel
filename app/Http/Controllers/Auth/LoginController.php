@@ -2,19 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ApiLoginRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Http\Responses\UnauthenticatedResponse;
 use App\Interfaces\UserRepositoryInterface;
+use Illuminate\Config\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
     public function __construct(
-        protected readonly UserRepositoryInterface $userRepository
+        protected readonly UserRepositoryInterface $userRepository,
+        protected readonly Repository $config,
     ) {
     }
     public function __invoke(ApiLoginRequest $request): JsonResponse
@@ -29,14 +32,14 @@ class LoginController extends Controller
         }
 
         // Generate tokens
-        $accessToken = $user->createToken('access_token', [], now()->addSeconds(UserRepositoryInterface::ACCESS_TOKEN_LIFETIME_IN_SECONDS))->plainTextToken;
-        $refreshToken = $user->createToken('refresh_token', ['refresh'], now()->addSeconds(UserRepositoryInterface::REFRESH_TOKEN_LIFETIME_IN_SECONDS))->plainTextToken;
+        $accessToken = $user->createToken('access_token', [], now()->addSeconds($this->config->integer('auth.access_token_lifetime_in_seconds')))->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', ['refresh'], now()->addSeconds(config()->integer('auth.refresh_token_lifetime_in_seconds')))->plainTextToken;
 
         return SuccessResponse::make(data: [
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
-            'expires_in' => 900, // 15 minutes
-            'expires_at' => now()->addMinutes(15)->toDateTimeString(),
+            'expires_in' => $this->config->integer('auth.access_token_lifetime_in_seconds'),
+            'expires_at' => now()->addMinutes($this->config->integer('auth.access_token_lifetime_in_seconds'))->toDateTimeString(),
         ]);
     }
 }

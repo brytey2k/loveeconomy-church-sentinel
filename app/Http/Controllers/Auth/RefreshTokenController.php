@@ -2,17 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Http\Responses\SuccessResponse;
 use App\Http\Responses\UnauthenticatedResponse;
 use App\Models\User;
+use Illuminate\Config\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class RefreshTokenController extends Controller
 {
+    public function __construct(
+        protected readonly Repository $config,
+    ) {
+    }
+
     public function __invoke(Request $request): JsonResponse
     {
         $refreshToken = PersonalAccessToken::findToken($request->bearerToken());
@@ -50,8 +57,8 @@ class RefreshTokenController extends Controller
 
         return SuccessResponse::make(data: [
             'access_token' => $newAccessToken,
-            'expires_in' => 900, // 15 minutes
-            'expires_at' => now()->addMinutes(15)->toDateTimeString(),
+            'expires_in' => $this->config->integer('auth.access_token_lifetime_in_seconds'),
+            'expires_at' => now()->addSeconds($this->config->integer('auth.access_token_lifetime_in_seconds'))->toDateTimeString(),
             'refresh_token' => $request->bearerToken(),
         ]);
     }

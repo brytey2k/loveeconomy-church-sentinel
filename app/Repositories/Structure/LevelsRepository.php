@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories;
+namespace App\Repositories\Structure;
 
-use App\Dto\CreateLevelDto;
-use App\Dto\UpdateLevelDto;
+use App\Dto\Structure\Levels\CreateLevelDto;
+use App\Dto\Structure\Levels\UpdateLevelDto;
 use App\Exceptions\LevelPositionAlreadyExistsException;
 use App\Models\Level;
 use Illuminate\Database\Eloquent\Collection;

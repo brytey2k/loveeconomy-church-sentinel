@@ -45,7 +45,7 @@ class UssdInteractionRequest extends FormRequest
             clientState: $this->post('ClientState'),
             mobile: $this->post('Mobile'),
             sessionId: $this->post('SessionId'),
-            sequence: $this->post('Sequence'),
+            sequence: $this->integer('Sequence'),
             platform: $this->post('Platform')
         );
     }

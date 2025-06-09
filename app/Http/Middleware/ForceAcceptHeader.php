@@ -16,6 +16,7 @@ class ForceAcceptHeader
     {
         $this->contentType = $contentType;
     }
+
     /**
      * Handle an incoming request.
      *
