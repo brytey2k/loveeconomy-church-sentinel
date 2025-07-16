@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Create ltree extension
         run: |
-          PGPASSWORD=postgres psql -U postgres -d lec_sentinel_testing -h localhost -c "CREATE EXTENSION IF NOT EXISTS ltree;"
+          PGPASSWORD=test_password psql -U test_user -d lec_sentinel_testing -h localhost -c "CREATE EXTENSION IF NOT EXISTS ltree;"
 
       - name: Checkout Code
         uses: actions/checkout@v4
