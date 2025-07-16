@@ -6,6 +6,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Web\Auth\LoginController;
 use App\Http\Controllers\Web\Auth\LogoutController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\LevelsController;
 use App\Http\Controllers\Web\PermissionsController;
 use App\Http\Controllers\Web\RolesController;
 use Illuminate\Support\Facades\Route;
@@ -25,4 +26,5 @@ Route::middleware(['auth'])->group(static function () {
     Route::resource('/permissions', PermissionsController::class)->names('permissions')
         ->except(['show', 'destroy']);
     Route::resource('/users', UsersController::class)->names('users');
+    Route::resource('/levels', LevelsController::class)->names('levels');
 });
