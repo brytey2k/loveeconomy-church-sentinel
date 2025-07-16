@@ -17,19 +17,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  *
- * @method static \Database\Factories\LevelFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Level withoutTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Level newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Level newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Level query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Level whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Level whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Level wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Level whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Level whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Level whereDeletedAt($value)
  *
  * @mixin \Eloquent
  */
@@ -39,14 +35,20 @@ class Level extends Model
     use HasFactory;
     use SoftDeletes;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'organization.levels';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'position',
     ];
-
-    protected $casts = [
-        'position' => 'integer',
-    ];
-
-    protected $table = 'organization.levels';
 }
