@@ -41,8 +41,19 @@ jobs:
           extensions: mbstring, bcmath, ctype, fileinfo, json, pdo, pdo_pgsql, tokenizer, xml, redis
           tools: composer
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
+
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Build Assets
+        run: npm run build
 
       - name: Set Up Environment File
         run: |
