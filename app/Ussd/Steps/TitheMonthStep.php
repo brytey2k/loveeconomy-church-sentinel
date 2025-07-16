@@ -90,8 +90,12 @@ class TitheMonthStep extends MonthStep
      *
      * @throws Exception
      */
-    protected function resolveMonth(string $monthString): string
+    protected function resolveMonth(string|null $monthString): string
     {
+        if ($monthString === null || $monthString === '') {
+            throw new Exception('Month string cannot be empty');
+        }
+
         // check that the string is also a valid month string like 1, 01, Jan, January using Carbon
         foreach (['m', 'M', 'n', 'F'] as $format) {
             try {

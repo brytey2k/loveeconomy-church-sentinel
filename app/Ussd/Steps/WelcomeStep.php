@@ -94,7 +94,7 @@ class WelcomeStep extends BaseStep implements UssdStepInterface
                 ussdTransactionData: $txData,
                 data: [
                     'tx_data' => array_merge($txData['tx_data'], [
-                        UssdDataKey::ACTION->value => $option->getNextStep()->getAction()->value,
+                        UssdDataKey::ACTION->value => $option->getNextStep()?->getAction()->value,
                     ]),
                 ]
             );

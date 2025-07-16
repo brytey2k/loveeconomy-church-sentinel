@@ -39,7 +39,7 @@ class SendPaymentPromptStep extends BaseStep implements UssdStepInterface
                 'Item' => [
                     'ItemName' => 'Payment',
                     'Qty' => 1,
-                    'Price' => $txData->tx_data[UssdDataKey::AMOUNT->value],
+                    'Price' => $txData?->tx_data[UssdDataKey::AMOUNT->value],
                 ],
                 'Label' => static::getKey()->getLabel(),
                 'DataType' => 'display',

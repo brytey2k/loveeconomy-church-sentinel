@@ -14,6 +14,7 @@ use App\Repositories\UssdTransactionDataRepository;
 use App\Ussd\Contracts\YearStep;
 use App\Ussd\Option;
 use Exception;
+use http\Exception\InvalidArgumentException;
 
 class TitheYearStep extends YearStep
 {
@@ -84,12 +85,16 @@ class TitheYearStep extends YearStep
     }
 
     /**
-     * @param string $yearString
+     * @param string|null $yearString
      *
      * @throws Exception
      */
-    protected function validateYear(string $yearString): void
+    protected function validateYear(string|null $yearString): void
     {
+        if ($yearString === null || trim($yearString) === '') {
+            throw new InvalidArgumentException('Year cannot be empty');
+        }
+
         if (!preg_match('/^\d{4}$/', $yearString)) {
             throw new Exception('Invalid year');
         }
