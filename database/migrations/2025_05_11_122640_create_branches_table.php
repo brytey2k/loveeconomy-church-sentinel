@@ -15,8 +15,8 @@ return new class () extends Migration {
         Schema::create('organization.branches', static function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('level_id')->constrained()->noActionOnDelete();
-            $table->foreignId('country_id')->constrained()->noActionOnDelete();
+            $table->foreignId('level_id')->constrained('organization.levels')->noActionOnDelete();
+            $table->foreignId('country_id')->constrained('organization.countries')->noActionOnDelete();
             $table->bigInteger('parent_id');
             $table->labelTree('path');
             $table->softDeletes();
