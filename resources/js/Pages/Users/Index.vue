@@ -3,14 +3,22 @@ import AuthLayout from "../../Layouts/AuthLayout.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
 import Card from "../../Components/Card.vue";
 import Pagination from "../../Components/Pagination.vue";
-import {Link} from "@inertiajs/vue3";
+import {Link, useForm} from "@inertiajs/vue3";
 
 defineProps({
     users: Object,
 })
 
-function confirmDelete() {
-    return confirm('Are you sure you want to delete this user?');
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        const form = useForm();
+        form.delete(`/users/${userId}`, {
+            onError: (errors) => {
+                // Handle errors if needed
+                console.error(errors);
+            }
+        });
+    }
 }
 </script>
 
@@ -64,9 +72,9 @@ function confirmDelete() {
                                             <Link :href="`/users/${user.id}/edit`" class="btn btn-info btn-sm">
                                                 <i class="fas fa-pencil-alt"></i> Edit
                                             </Link>
-                                            <Link @click.prevent="confirmDelete" :href="`/users/${user.id}`" method="delete" class="btn btn-danger btn-sm ml-2">
+                                            <button @click.prevent="deleteUser(user.id)" class="btn btn-danger btn-sm ml-2">
                                                 <i class="fas fa-trash"></i> Delete
-                                            </Link>
+                                            </button>
                                         </td>
                                     </tr>
                                     </tbody>
