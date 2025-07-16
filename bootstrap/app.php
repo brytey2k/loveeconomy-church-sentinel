@@ -8,6 +8,7 @@ use App\Exceptions\MissingOptionException;
 use App\Exceptions\MissingStepException;
 use App\Exceptions\SentinelException;
 use App\Http\Middleware\ForceAcceptHeader;
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Responses\ErrorResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Providers\UserRepositoryProvider;
@@ -25,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(static function (Middleware $middleware) {
         $middleware->alias(['force.accept-header' => ForceAcceptHeader::class]);
+        $middleware->web(append: [
+            HandleInertiaRequests::class,
+        ]);
     })
     ->withProviders([
         UserRepositoryProvider::class,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ussd\Steps;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Enums\UssdAction;
 use App\Enums\UssdDataKey;
 use App\Enums\UssdResponseType;
@@ -18,7 +18,7 @@ use App\Ussd\Option;
 
 class SendPaymentPromptStep extends BaseStep implements UssdStepInterface
 {
-    protected UssdInteractionRequestDto $requestDto;
+    protected UssdInteractionRequestData $requestDto;
 
     public function __construct(
         protected UssdInteractionRequest $request,
@@ -27,7 +27,7 @@ class SendPaymentPromptStep extends BaseStep implements UssdStepInterface
         $this->requestDto = $this->request->toDto();
     }
 
-    public function handle(UssdInteractionRequestDto $requestDto, string|null $message = null, bool $replace = false): mixed
+    public function handle(UssdInteractionRequestData $requestDto, string|null $message = null, bool $replace = false): mixed
     {
         $txData = $this->ussdTransactionDataRepository->findBySessionId($requestDto->sessionId);
 

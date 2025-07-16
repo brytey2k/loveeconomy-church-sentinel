@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Interfaces;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Enums\UssdAction;
 use App\Enums\UssdStepKey;
 use App\Exceptions\MissingStepException;
@@ -13,7 +13,7 @@ use Exception;
 
 interface UssdStepInterface
 {
-    public function handle(UssdInteractionRequestDto $requestDto, string|null $message = null, bool $replace = false): mixed;
+    public function handle(UssdInteractionRequestData $requestDto, string|null $message = null, bool $replace = false): mixed;
 
     /**
      * @return array<Option>

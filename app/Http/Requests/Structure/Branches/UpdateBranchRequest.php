@@ -8,7 +8,6 @@ use App\Dto\Structure\Branches\UpdateBranchDto;
 use App\Models\Branch;
 use App\Models\Country;
 use App\Models\Level;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +24,7 @@ class UpdateBranchRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, list<\Illuminate\Validation\Rules\Exists|string>>
      */
     public function rules(): array
     {

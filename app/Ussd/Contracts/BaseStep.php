@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ussd\Contracts;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Exceptions\DuplicateOptionKeysException;
 use App\Ussd\Option;
 
@@ -49,12 +49,12 @@ abstract class BaseStep
      */
     abstract public function getOptions(): array;
 
-    final public function isInitiationStep(UssdInteractionRequestDto $requestDto): bool
+    final public function isInitiationStep(UssdInteractionRequestData $requestDto): bool
     {
         return ($requestDto->clientState === '' || $requestDto->clientState === null) && $requestDto->type === 'Initiation';
     }
 
-    final public function isTimeoutStep(UssdInteractionRequestDto $requestDto): bool
+    final public function isTimeoutStep(UssdInteractionRequestData $requestDto): bool
     {
         return $requestDto->type === 'Timeout';
     }

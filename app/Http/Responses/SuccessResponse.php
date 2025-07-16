@@ -10,6 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SuccessResponse extends JsonResponse
 {
+    /**
+     * @param array<int|string, mixed>|LengthAwarePaginator<mixed> $data
+     * @param int $statusCode
+     * @param array<string, mixed> $headers
+     *
+     * @return self
+     */
     public static function make(
         array|LengthAwarePaginator $data = [],
         int $statusCode = Response::HTTP_OK,

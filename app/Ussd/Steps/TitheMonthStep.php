@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ussd\Steps;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Enums\UssdAction;
 use App\Enums\UssdDataKey;
 use App\Enums\UssdStepKey;
@@ -18,7 +18,7 @@ use Exception;
 
 class TitheMonthStep extends MonthStep
 {
-    protected UssdInteractionRequestDto $requestDto;
+    protected UssdInteractionRequestData $requestDto;
 
     public function __construct(
         protected UssdTransactionDataRepository $ussdTransactionDataRepository,
@@ -28,7 +28,7 @@ class TitheMonthStep extends MonthStep
         $this->requestDto = $this->request->toDto();
     }
 
-    public function handle(UssdInteractionRequestDto $requestDto, string|null $message = null, bool $replace = false): mixed
+    public function handle(UssdInteractionRequestData $requestDto, string|null $message = null, bool $replace = false): mixed
     {
         $message = 'Enter month (Jan to Dec) of payment';
 

@@ -14,7 +14,7 @@ class PostRefreshAuthTokenTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function it_refreshes_token_successfully()
+    public function it_refreshes_token_successfully(): void
     {
         $this->freezeTime();
 

@@ -2,23 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Data\Ussd;
 
-class UssdInteractionRequestDto
+class UssdInteractionRequestData
 {
-    /**
-     * Create a new class instance.
-     *
-     * @param ?string $type
-     * @param ?string $message
-     * @param ?string $serviceCode
-     * @param ?string $operator
-     * @param ?string $clientState
-     * @param ?string $mobile
-     * @param ?string $sessionId
-     * @param ?int $sequence
-     * @param ?string $platform
-     */
     public function __construct(
         public string|null $type,
         public string|null $message,
@@ -32,6 +19,9 @@ class UssdInteractionRequestDto
     ) {
     }
 
+    /**
+     * @return array<string, string|int|null>
+     */
     public function toArray(): array
     {
         return [

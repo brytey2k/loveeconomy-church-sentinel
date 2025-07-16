@@ -38,7 +38,7 @@ use Umbrellio\LTree\Traits\LTreeModelTrait;
  * @method static Builder<static>|Branch ancestorsOf(\Umbrellio\LTree\Interfaces\LTreeModelInterface $model, bool $reverse = true)
  * @method static Builder<static>|Branch descendantsOf(\Umbrellio\LTree\Interfaces\LTreeModelInterface $model, bool $reverse = true)
  * @method static \Umbrellio\LTree\Collections\LTreeCollection<int, static> get($columns = ['*'])
- * @method static Builder<static>|Branch parentsOf(array $paths)
+ * @method static Builder<static>|Branch parentsOf(array<string> $paths)
  * @method static Builder<static>|Branch root()
  * @method static Builder<static>|Branch whereParentId($value)
  * @method static Builder<static>|Branch withoutSelf(int $id)

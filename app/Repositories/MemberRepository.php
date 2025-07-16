@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Dto\CreateMemberDto;
+use App\Data\CreateMemberData;
 use App\Models\Member;
 
 class MemberRepository
@@ -14,7 +14,7 @@ class MemberRepository
         return Member::query()->where('phone', $phoneNumber)->first();
     }
 
-    public function create(CreateMemberDto $data): Member
+    public function create(CreateMemberData $data): Member
     {
         return Member::query()->create($data->toArray());
     }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Data;
 
-class CreateMemberDto
+class CreateMemberData
 {
     public function __construct(
         public string $firstName,
@@ -13,6 +13,9 @@ class CreateMemberDto
     ) {
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function toArray(): array
     {
         return [

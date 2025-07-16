@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Enums\UssdResponseType;
 use App\Enums\UssdStepKey;
 use App\Exceptions\MissingStepException;
@@ -54,14 +54,14 @@ class UssdService
     }
 
     /**
-     * @param UssdInteractionRequestDto $requestDto
+     * @param UssdInteractionRequestData $requestDto
      *
-     * @throws MissingStepException
      * @throws BindingResolutionException
+     * @throws MissingStepException
      *
      * @return SuccessResponse
      */
-    public function processRequest(UssdInteractionRequestDto $requestDto): SuccessResponse
+    public function processRequest(UssdInteractionRequestData $requestDto): SuccessResponse
     {
         $this->ussdSessionRepository->create($requestDto);
 
@@ -77,14 +77,14 @@ class UssdService
 
     /**
      * @param string $currentStep
-     * @param UssdInteractionRequestDto $requestDto
+     * @param UssdInteractionRequestData $requestDto
      *
-     * @throws MissingStepException
      * @throws BindingResolutionException
+     * @throws MissingStepException
      *
      * @return SuccessResponse
      */
-    protected function handleStep(string $currentStep, UssdInteractionRequestDto $requestDto): SuccessResponse
+    protected function handleStep(string $currentStep, UssdInteractionRequestData $requestDto): SuccessResponse
     {
         if (isset($this->steps[$currentStep])) {
             $stepClass = $this->steps[$currentStep];
@@ -114,7 +114,7 @@ class UssdService
         throw new MissingStepException(requestDto: $requestDto, message: 'Invalid step encountered');
     }
 
-    protected function makeReleaseResponse(UssdInteractionRequestDto $requestDto): SuccessResponse
+    protected function makeReleaseResponse(UssdInteractionRequestData $requestDto): SuccessResponse
     {
         return SuccessResponse::make(
             data: [

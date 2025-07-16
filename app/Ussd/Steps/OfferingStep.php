@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ussd\Steps;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Enums\UssdAction;
 use App\Enums\UssdStepKey;
 use App\Interfaces\UssdStepInterface;
@@ -18,7 +18,7 @@ class OfferingStep extends BaseStep implements UssdStepInterface
     ) {
     }
 
-    public function handle(UssdInteractionRequestDto $requestDto, string|null $message = null, bool $replace = false): mixed
+    public function handle(UssdInteractionRequestData $requestDto, string|null $message = null, bool $replace = false): mixed
     {
         // append offering action to client state and proxy this to the amount step
         $requestDto->clientState = sprintf('%s/%s', $requestDto->clientState, static::getKey()->value);

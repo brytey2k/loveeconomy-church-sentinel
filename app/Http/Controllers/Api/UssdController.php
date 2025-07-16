@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Actions\ServiceFulfilment;
 use App\Exceptions\MissingStepException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\UssdFulfillmentRequest;
 use App\Http\Requests\UssdInteractionRequest;
 use App\Http\Responses\SuccessResponse;

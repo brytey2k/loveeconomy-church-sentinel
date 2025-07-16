@@ -6,7 +6,6 @@ namespace App\Http\Requests\Structure\Levels;
 
 use App\Dto\Structure\Levels\CreateLevelDto;
 use App\Models\Level;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +22,7 @@ class CreateLevelRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, list<\Illuminate\Validation\Rules\Unique|string>>
      */
     public function rules(): array
     {

@@ -17,6 +17,9 @@ class LevelsRepository
         return Level::create($createLevelDto->toArray());
     }
 
+    /**
+     * @return Collection<int, Level>
+     */
     public function get(): Collection
     {
         return Level::get();

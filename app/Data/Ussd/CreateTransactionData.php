@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Data\Ussd;
 
 use App\Enums\PaymentProvider;
 use App\Enums\TransactionState;
 use App\Enums\TransactionType;
 
-class CreateTransactionDto
+class CreateTransactionData
 {
     public function __construct(
         public int $memberId,
@@ -23,6 +23,9 @@ class CreateTransactionDto
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [

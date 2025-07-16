@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Dto\UssdInteractionRequestDto;
+use App\Data\Ussd\UssdInteractionRequestData;
 use App\Models\UssdSession;
 
 class UssdSessionRepository
@@ -13,7 +13,7 @@ class UssdSessionRepository
     {
     }
 
-    public function create(UssdInteractionRequestDto $dto): UssdSession
+    public function create(UssdInteractionRequestData $dto): UssdSession
     {
         return UssdSession::query()->create([
             'session_id' => $dto->sessionId,

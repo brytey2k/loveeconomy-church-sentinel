@@ -10,6 +10,7 @@ use App\Http\Requests\Structure\Branches\UpdateBranchRequest;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Branch;
 use App\Repositories\Structure\BranchesRepository;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class BranchesController extends Controller
@@ -21,14 +22,14 @@ class BranchesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
         return SuccessResponse::make(
             data: $this->branchesRepository->list()
         );
     }
 
-    public function store(CreateBranchRequest $request)
+    public function store(CreateBranchRequest $request): JsonResponse
     {
         return SuccessResponse::make(
             data: $this->branchesRepository->create($request->toDto())->toArray(),
@@ -36,14 +37,14 @@ class BranchesController extends Controller
         );
     }
 
-    public function show(Branch $branch)
+    public function show(Branch $branch): JsonResponse
     {
         return SuccessResponse::make(
             data: $branch->toArray(),
         );
     }
 
-    public function update(UpdateBranchRequest $request, Branch $branch)
+    public function update(UpdateBranchRequest $request, Branch $branch): JsonResponse
     {
         return SuccessResponse::make(
             data: $this->branchesRepository->update($branch, $request->toDto())->toArray(),
@@ -59,7 +60,7 @@ class BranchesController extends Controller
      *
      * @return SuccessResponse
      */
-    public function destroy(Branch $branch)
+    public function destroy(Branch $branch): JsonResponse
     {
         return SuccessResponse::make(
             data: $this->branchesRepository->delete($branch)->toArray()

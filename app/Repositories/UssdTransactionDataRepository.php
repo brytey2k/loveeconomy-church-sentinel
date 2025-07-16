@@ -27,6 +27,12 @@ class UssdTransactionDataRepository
         ]);
     }
 
+    /**
+     * @param UssdTransactionData $ussdTransactionData
+     * @param array<string, mixed> $data
+     *
+     * @return bool
+     */
     public function update(UssdTransactionData $ussdTransactionData, array $data): bool
     {
         return $ussdTransactionData->update($data);

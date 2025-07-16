@@ -14,6 +14,9 @@ class CreateBranchDto
     ) {
     }
 
+    /**
+     * @return array<string, string|int|null>
+     */
     public function toArray(): array
     {
         return [

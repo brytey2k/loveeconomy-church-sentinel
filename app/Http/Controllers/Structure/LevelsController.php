@@ -21,14 +21,14 @@ class LevelsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): SuccessResponse
     {
         return SuccessResponse::make(
             data: $this->levelsRepository->get()->toArray()
         );
     }
 
-    public function store(CreateLevelRequest $request)
+    public function store(CreateLevelRequest $request): SuccessResponse
     {
         return SuccessResponse::make(
             data: $this->levelsRepository->create($request->toDto())->toArray(),
@@ -36,14 +36,14 @@ class LevelsController extends Controller
         );
     }
 
-    public function show(Level $level)
+    public function show(Level $level): SuccessResponse
     {
         return SuccessResponse::make(
             data: $level->toArray(),
         );
     }
 
-    public function update(UpdateLevelRequest $request, Level $level)
+    public function update(UpdateLevelRequest $request, Level $level): SuccessResponse
     {
         return SuccessResponse::make(
             data: $this->levelsRepository->update($level, $request->toDto())->toArray(),
@@ -55,7 +55,7 @@ class LevelsController extends Controller
      *
      * @param Level $level
      */
-    public function destroy(Level $level)
+    public function destroy(Level $level): SuccessResponse
     {
         return SuccessResponse::make(
             data: $this->levelsRepository->delete($level)->toArray()

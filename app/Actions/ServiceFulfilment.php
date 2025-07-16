@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Dto\CreateMemberDto;
-use App\Dto\CreateTransactionDto;
+use App\Data\CreateMemberData;
+use App\Data\Ussd\CreateTransactionData;
 use App\Enums\PaymentProvider;
 use App\Enums\TransactionState;
 use App\Enums\TransactionType;
@@ -87,7 +87,7 @@ class ServiceFulfilment
     {
         Log::info('Creating transaction for missing session');
 
-        $transaction = $this->transactionRepository->create(data: new CreateTransactionDto(
+        $transaction = $this->transactionRepository->create(data: new CreateTransactionData(
             memberId: 0,
             type: TransactionType::SEED,
             amount: $amount,
@@ -111,7 +111,7 @@ class ServiceFulfilment
             'member' => $member,
         ]);
 
-        $transaction = $this->transactionRepository->create(data: new CreateTransactionDto(
+        $transaction = $this->transactionRepository->create(data: new CreateTransactionData(
             memberId: $member->id,
             type: UssdAction::from($ussdTxData->tx_data[UssdDataKey::ACTION->value])->toTransactionType(),
             amount: (float) $ussdTxData->tx_data[UssdDataKey::AMOUNT->value],
@@ -144,7 +144,7 @@ class ServiceFulfilment
                 'phoneNumber' => $this->request->string('OrderInfo.CustomerMobileNumber')->toString()
             ]);
 
-            $member = $this->memberRepository->create(data: new CreateMemberDto(
+            $member = $this->memberRepository->create(data: new CreateMemberData(
                 firstName: $this->request->string('OrderInfo.CustomerName')->toString(),
                 lastName: '',
                 phone: $this->request->string('OrderInfo.CustomerMobileNumber')->toString(),
