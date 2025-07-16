@@ -46,6 +46,10 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Create ltree extension
+        run: |
+          PGPASSWORD=postgres psql -U test_user -d lec_sentinel_testing -h localhost -c "CREATE EXTENSION IF NOT EXISTS ltree;"
+
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
 
