@@ -19,6 +19,7 @@ class CreateMemberData extends Data
         public int $position_id,
         /**
          * Array of tag keys to assign to the member, e.g., ['partner','tither']
+         *
          * @var array<int, string>
          */
         public array $tags = [],

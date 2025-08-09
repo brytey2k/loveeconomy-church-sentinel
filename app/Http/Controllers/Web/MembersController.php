@@ -9,8 +9,8 @@ use App\Data\UpdateMemberData;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Repositories\MemberRepository;
-use App\Repositories\Structure\BranchesRepository;
 use App\Repositories\PositionsRepository;
+use App\Repositories\Structure\BranchesRepository;
 use App\Repositories\TagRepository;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -50,6 +50,8 @@ class MembersController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param CreateMemberData $memberData
      */
     public function store(CreateMemberData $memberData): RedirectResponse
     {
@@ -60,6 +62,8 @@ class MembersController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * @param Member $member
      */
     public function edit(Member $member): Response
     {
@@ -74,6 +78,9 @@ class MembersController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param UpdateMemberData $updateMemberData
+     * @param Member $member
      */
     public function update(UpdateMemberData $updateMemberData, Member $member): RedirectResponse
     {
@@ -84,6 +91,8 @@ class MembersController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param Member $member
      */
     public function destroy(Member $member): RedirectResponse
     {

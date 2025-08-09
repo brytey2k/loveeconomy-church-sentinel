@@ -16,6 +16,7 @@ class CurrencyRepository
      * Get all currencies without pagination, ordered by name.
      *
      * @param array<string> $relations The relations to eager load
+     *
      * @return Collection<int, Currency>
      */
     public function all(array $relations = []): Collection
@@ -27,6 +28,7 @@ class CurrencyRepository
      * Get all currencies with pagination, ordered by name.
      *
      * @param array<string> $relations The relations to eager load
+     *
      * @return LengthAwarePaginator<Currency>
      */
     public function paginate(array $relations = []): LengthAwarePaginator

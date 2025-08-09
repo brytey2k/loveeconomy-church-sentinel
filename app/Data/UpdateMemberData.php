@@ -24,6 +24,7 @@ class UpdateMemberData extends Data
         public int $position_id,
         /**
          * Array of tag keys to assign to the member
+         *
          * @var array<int, string>
          */
         public array $tags = [],

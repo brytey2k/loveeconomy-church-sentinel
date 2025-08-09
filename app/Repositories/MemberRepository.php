@@ -21,6 +21,7 @@ class MemberRepository
      * Get all members without pagination, ordered by first_name.
      *
      * @param array<string> $relations The relations to eager load
+     *
      * @return Collection<int, Member>
      */
     public function all(array $relations = []): Collection
@@ -32,6 +33,7 @@ class MemberRepository
      * Get all members with pagination, ordered by first_name.
      *
      * @param array<string> $relations The relations to eager load
+     *
      * @return LengthAwarePaginator<Member>
      */
     public function paginate(array $relations = []): LengthAwarePaginator
@@ -58,6 +60,8 @@ class MemberRepository
 
     /**
      * Create a new member with tags.
+     *
+     * @param CreateMemberData $data
      */
     public function create(CreateMemberData $data): Member
     {
@@ -81,6 +85,9 @@ class MemberRepository
 
     /**
      * Update an existing member and its tags.
+     *
+     * @param Member $member
+     * @param UpdateMemberData $data
      */
     public function update(Member $member, UpdateMemberData $data): Member
     {
@@ -101,6 +108,8 @@ class MemberRepository
 
     /**
      * Delete a member.
+     *
+     * @param Member $member
      */
     public function delete(Member $member): bool
     {

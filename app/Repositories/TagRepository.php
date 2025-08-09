@@ -22,6 +22,7 @@ class TagRepository
      *
      * @param array<int, string> $keys
      * @param bool $createMissing
+     *
      * @return array<int, int> tag IDs
      */
     public function getIdsForKeys(array $keys, bool $createMissing = true): array
