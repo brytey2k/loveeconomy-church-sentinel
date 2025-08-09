@@ -12,7 +12,7 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('organization.countries', static function (Blueprint $table) {
+        Schema::create('church.positions', static function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->softDeletes();
@@ -25,6 +25,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('organization.countries');
+        Schema::dropIfExists('church.positions');
     }
 };

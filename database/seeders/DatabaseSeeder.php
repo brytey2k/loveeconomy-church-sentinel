@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Tag;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,11 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         User::factory()->create([
             'name' => 'Bright Nkrumah',
             'email' => 'brytey2k@gmail.com',
         ]);
+
+        // Seed baseline tags if missing
+        foreach ([
+            ['key' => 'partner', 'name' => 'Partner'],
+            ['key' => 'tither', 'name' => 'Tither'],
+        ] as $seedTag) {
+            Tag::query()->firstOrCreate(['key' => $seedTag['key']], $seedTag);
+        }
     }
 }

@@ -5,9 +5,14 @@ declare(strict_types=1);
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Web\Auth\LoginController;
 use App\Http\Controllers\Web\Auth\LogoutController;
+use App\Http\Controllers\Web\BranchesController;
+use App\Http\Controllers\Web\CountriesController;
+use App\Http\Controllers\Web\CurrenciesController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\LevelsController;
+use App\Http\Controllers\Web\MembersController;
 use App\Http\Controllers\Web\PermissionsController;
+use App\Http\Controllers\Web\PositionsController;
 use App\Http\Controllers\Web\RolesController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +32,9 @@ Route::middleware(['auth'])->group(static function () {
         ->except(['show', 'destroy']);
     Route::resource('/users', UsersController::class)->names('users');
     Route::resource('/levels', LevelsController::class)->names('levels');
+    Route::resource('/branches', BranchesController::class)->names('branches');
+    Route::resource('/countries', CountriesController::class)->names('countries');
+    Route::resource('/currencies', CurrenciesController::class)->names('currencies');
+    Route::resource('/members', MembersController::class)->names('members');
+    Route::resource('/positions', PositionsController::class)->names('positions');
 });

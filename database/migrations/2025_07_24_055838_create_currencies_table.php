@@ -12,11 +12,12 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('church.members', static function (Blueprint $table) {
+        Schema::create('finance.currencies', static function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name')->nullable();
-            $table->string('phone');
+            $table->string('name');
+            $table->string('short_name');
+            $table->string('symbol');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('church.members');
+        Schema::dropIfExists('finance.currencies');
     }
 };

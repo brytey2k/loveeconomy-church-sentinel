@@ -145,8 +145,8 @@ class ServiceFulfilment
             ]);
 
             $member = $this->memberRepository->create(data: new CreateMemberData(
-                firstName: $this->request->string('OrderInfo.CustomerName')->toString(),
-                lastName: '',
+                first_name: $this->request->string('OrderInfo.CustomerName')->toString(),
+                last_name: '',
                 phone: $this->request->string('OrderInfo.CustomerMobileNumber')->toString(),
             ));
 

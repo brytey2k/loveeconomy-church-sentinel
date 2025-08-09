@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories;
+namespace App\Repositories\Structure;
 
 use App\Data\CreateLevelData;
 use App\Data\UpdateLevelData;

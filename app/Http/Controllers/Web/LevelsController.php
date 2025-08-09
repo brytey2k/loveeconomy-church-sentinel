@@ -8,7 +8,7 @@ use App\Data\CreateLevelData;
 use App\Data\UpdateLevelData;
 use App\Http\Controllers\Controller;
 use App\Models\Level;
-use App\Repositories\LevelRepository;
+use App\Repositories\Structure\LevelRepository;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;

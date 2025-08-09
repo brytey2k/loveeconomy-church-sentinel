@@ -6,8 +6,6 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\RefreshTokenController;
 use App\Http\Controllers\Api\UssdController;
-use App\Http\Controllers\Structure\BranchesController;
-use App\Http\Controllers\Structure\LevelsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,7 +22,4 @@ Route::post('/token/refresh', RefreshTokenController::class);
 Route::middleware(['auth:sanctum'])->group(static function () {
     Route::post('/logout', LogoutController::class);
     Route::get('/user', static fn (Request $request) => $request->user());
-
-    Route::apiResource('/levels', LevelsController::class);
-    Route::apiResource('/branches', BranchesController::class);
 });

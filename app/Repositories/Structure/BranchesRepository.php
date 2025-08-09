@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repositories\Structure;
 
-use App\Dto\Structure\Branches\CreateBranchDto;
-use App\Dto\Structure\Branches\UpdateBranchDto;
+use App\Data\CreateBranchData;
+use App\Data\UpdateBranchData;
 use App\Models\Branch;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Umbrellio\LTree\Interfaces\LTreeServiceInterface;
@@ -18,22 +19,34 @@ class BranchesRepository
     }
 
     /**
+     * @param array $relations
+     *
      * @return LengthAwarePaginator<Branch>
      */
-    public function list(): LengthAwarePaginator
+    public function list(array $relations = []): LengthAwarePaginator
     {
-        return Branch::paginate();
+        return Branch::with($relations)->paginate();
+    }
+
+    public function all(): Collection
+    {
+        return Branch::all();
+    }
+
+    public function allExcept(array $ids): Collection
+    {
+        return Branch::whereNotIn('id', $ids)->get();
     }
 
     /**
-     * @param CreateBranchDto $createBranchDto
+     * @param CreateBranchData $createBranchData
      *
      * @throws \Throwable
      */
-    public function create(CreateBranchDto $createBranchDto): Branch
+    public function create(CreateBranchData $createBranchData): Branch
     {
-        return DB::transaction(function () use ($createBranchDto) {
-            $branch = Branch::create($createBranchDto->toArray());
+        return DB::transaction(function () use ($createBranchData) {
+            $branch = Branch::create($createBranchData->toArray());
             $this->lTreeService->createPath($branch);
 
             return $branch;
@@ -42,11 +55,11 @@ class BranchesRepository
 
     /**
      * @param Branch $branch
-     * @param UpdateBranchDto $updateBranchDto
+     * @param UpdateBranchData $updateBranchDto
      *
      * @throws \Throwable
      */
-    public function update(Branch $branch, UpdateBranchDto $updateBranchDto): Branch
+    public function update(Branch $branch, UpdateBranchData $updateBranchDto): Branch
     {
         return DB::transaction(function () use ($branch, $updateBranchDto) {
             $branch->update($updateBranchDto->toArray());
@@ -63,24 +76,25 @@ class BranchesRepository
      */
     public function delete(Branch $branch): Branch
     {
-        return DB::transaction(static function () use ($branch) {
-            // todo: contribute this to ltree package
+        return DB::transaction(function () use ($branch) {
+            // Get the parent ID of the branch being deleted
+            $parentId = $branch->parent_id;
 
-            // todo: we need to correct the parent_id fields of the children
-            DB::statement(sprintf(
-                "update %s set %s = subpath(%s, 1) where %s <@ '%s' and %s != '%s'",
-                $branch->getTable(),
-                $branch->getLtreePathColumn(),
-                $branch->getLtreePathColumn(),
-                $branch->getLtreePathColumn(),
-                $branch->{$branch->getLtreePathColumn()},
-                $branch->getLtreePathColumn(),
-                $branch->{$branch->getLtreePathColumn()},
-            ));
+            // Update the parent_id of direct children to the parent of the deleted branch
+            Branch::where('parent_id', $branch->id)
+                ->update(['parent_id' => $parentId]);
+
+            // Drop descendants using the LTreeService
+            $this->lTreeService->dropDescendants($branch);
 
             $branch->delete();
 
             return $branch;
         });
+    }
+
+    public function find(int $id): Branch|null
+    {
+        return Branch::find($id);
     }
 }

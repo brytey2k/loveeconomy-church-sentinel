@@ -15,6 +15,7 @@ return new class () extends Migration {
     {
         Schema::create('finance.transactions', static function (Blueprint $table) {
             $table->id();
+            $table->dateTimeTz('tx_date')->comment('the actual date and time of the transaction');
             $table->foreignId('member_id');
             $table->char('type');
             $table->decimal('amount', 10, 2);

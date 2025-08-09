@@ -72,26 +72,50 @@ import {Link} from '@inertiajs/vue3';
                     </li>
                     <li class="nav-item">
                         <Link href="/users" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-user"></i>
                             <p>Users</p>
                         </Link>
                     </li>
                     <li class="nav-item">
                         <Link href="/roles" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-user-shield"></i>
                             <p>Roles</p>
                         </Link>
                     </li>
                     <li class="nav-item">
                         <Link href="/permissions" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-key"></i>
                             <p>Permissions</p>
                         </Link>
                     </li>
                     <li class="nav-item">
                         <Link href="/levels" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-signal"></i>
                             <p>Levels</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link href="/branches" class="nav-link">
+                            <i class="nav-icon fas fa-code-branch"></i>
+                            <p>Branches</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link href="/countries" class="nav-link">
+                            <i class="nav-icon fas fa-flag"></i>
+                            <p>Countries</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link href="/members" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Members</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link href="/positions" class="nav-link">
+                            <i class="nav-icon fas fa-briefcase"></i>
+                            <p>Positions</p>
                         </Link>
                     </li>
                     <li class="nav-item">

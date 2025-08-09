@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
@@ -24,5 +25,16 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Country extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'organization.countries';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+    ];
 }

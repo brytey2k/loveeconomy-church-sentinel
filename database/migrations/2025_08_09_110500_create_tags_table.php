@@ -7,24 +7,19 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class () extends Migration {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('organization.countries', static function (Blueprint $table) {
+        Schema::create('church.tags', static function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->softDeletes();
+            $table->string('key')->unique(); // stable machine key, e.g., 'partner'
+            $table->string('name'); // display name
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('organization.countries');
+        Schema::dropIfExists('church.tags');
     }
 };

@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->string('name');
             $table->foreignId('level_id')->constrained('organization.levels')->noActionOnDelete();
             $table->foreignId('country_id')->constrained('organization.countries')->noActionOnDelete();
-            $table->bigInteger('parent_id');
+            $table->bigInteger('parent_id')->nullable();
             $table->labelTree('path');
             $table->softDeletes();
             $table->timestamps();
