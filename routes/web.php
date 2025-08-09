@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\MembersController;
 use App\Http\Controllers\Web\PermissionsController;
 use App\Http\Controllers\Web\PositionsController;
 use App\Http\Controllers\Web\RolesController;
+use App\Http\Controllers\Web\TagsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['guest'])->group(static function () {
@@ -37,4 +38,6 @@ Route::middleware(['auth'])->group(static function () {
     Route::resource('/currencies', CurrenciesController::class)->names('currencies');
     Route::resource('/members', MembersController::class)->names('members');
     Route::resource('/positions', PositionsController::class)->names('positions');
+    Route::post('/tags/{tag}/restore', [TagsController::class, 'restore'])->name('tags.restore');
+    Route::resource('/tags', TagsController::class)->names('tags');
 });

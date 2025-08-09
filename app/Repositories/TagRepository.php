@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Tag;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TagRepository
 {
@@ -15,6 +16,41 @@ class TagRepository
     public function all(): Collection
     {
         return Tag::query()->orderBy('name')->get();
+    }
+
+    /**
+     * @param bool $onlyTrashed
+     *
+     * @return LengthAwarePaginator<Tag>
+     */
+    public function paginate(bool $onlyTrashed = false): LengthAwarePaginator
+    {
+        $query = Tag::query()->orderBy('name');
+        if ($onlyTrashed) {
+            $query->onlyTrashed();
+        }
+        return $query->paginate();
+    }
+
+    public function create(array $attributes): Tag
+    {
+        return Tag::query()->create($attributes);
+    }
+
+    public function update(Tag $tag, array $attributes): Tag
+    {
+        $tag->update($attributes);
+        return $tag;
+    }
+
+    public function delete(Tag $tag): bool
+    {
+        return (bool) $tag->delete();
+    }
+
+    public function restore(Tag $tag): bool
+    {
+        return (bool) $tag->restore();
     }
 
     /**

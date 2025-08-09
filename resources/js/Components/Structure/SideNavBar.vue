@@ -119,6 +119,12 @@ import {Link} from '@inertiajs/vue3';
                         </Link>
                     </li>
                     <li class="nav-item">
+                        <Link href="/tags" class="nav-link">
+                            <i class="nav-icon fas fa-tags"></i>
+                            <p>Tags</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
                         <Link method="post" href="/logout" class="nav-link" as="button">
                             <i class="nav-icon fas fa-sign-out-alt"></i>
                             <p>Logout</p>
