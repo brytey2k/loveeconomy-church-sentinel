@@ -38,6 +38,24 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereYearPaidFor($value)
  *
+ * @property string $tx_date the actual date and time of the transaction
+ * @property int $amount_raw Original amount stored in minor units (integer). Example: GHS 12.34 => 1234. Avoid floats.
+ * @property string $currency ISO 4217 currency code of the original/booked amount (e.g., GHS, USD, EUR).
+ * @property string $fx_rate Rate used to convert currency to reporting_currency at booking time. 1 when currency == reporting_currency.
+ * @property string $reporting_currency ISO 4217 code used for consolidated reporting (e.g., GHS). Stored per row for explicitness/audit.
+ * @property int $converted_raw Amount converted to reporting_currency in minor units using fx_rate and deterministic rounding.
+ * @property string|null $original_amount_entered The exact user-entered amount text preserved for audit (e.g., "100").
+ * @property string|null $original_amount_currency Currency as originally entered by the user (ISO 4217). Useful if parsing differs from stored currency.
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereAmountRaw($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereConvertedRaw($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereFxRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereOriginalAmountCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereOriginalAmountEntered($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereReportingCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereTxDate($value)
+ *
  * @mixin \Eloquent
  */
 class Transaction extends Model

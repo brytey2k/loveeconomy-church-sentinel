@@ -54,6 +54,9 @@ use Umbrellio\LTree\Traits\LTreeModelTrait;
  * @method static Builder<static>|Branch withTrashed()
  * @method static Builder<static>|Branch withoutTrashed()
  *
+ * @property-read Country $country
+ * @property-read Level $level
+ *
  * @mixin \Eloquent
  */
 class Branch extends Model implements LTreeModelInterface

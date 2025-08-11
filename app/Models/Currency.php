@@ -26,6 +26,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency withoutTrashed()
  *
  * @mixin \Eloquent
  */

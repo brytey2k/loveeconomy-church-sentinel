@@ -21,6 +21,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedAt($value)
  *
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Country extends Model

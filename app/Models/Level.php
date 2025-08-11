@@ -26,6 +26,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Level whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Level whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Level whereDeletedAt($value)
+ * @method static \Database\Factories\LevelFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Level onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Level withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Level withoutTrashed()
  *
  * @mixin \Eloquent
  */

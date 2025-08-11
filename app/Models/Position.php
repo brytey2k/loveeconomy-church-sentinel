@@ -21,6 +21,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereUpdatedAt($value)
  *
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Position withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Position extends Model

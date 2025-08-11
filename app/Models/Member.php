@@ -25,6 +25,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Member wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Member whereUpdatedAt($value)
  *
+ * @property int $branch_id
+ * @property int $position_id
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read Branch $branch
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, GivingType> $givingTypes
+ * @property-read int|null $giving_types_count
+ * @property-read Position $position
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Member onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Member whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Member whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Member wherePositionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Member withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Member withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Member extends Model

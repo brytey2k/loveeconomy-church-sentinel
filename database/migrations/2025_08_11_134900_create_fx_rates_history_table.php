@@ -27,11 +27,6 @@ return new class () extends Migration {
             $table->dateTimeTz('as_of_hour')
                 ->comment('Timestamp of the hourly snapshot (UTC recommended). Should be truncated to the start of the hour.');
 
-            $table->string('source')->nullable()
-                ->comment('Source of the rate snapshot (e.g., ECB, OXR, internal).');
-            $table->jsonb('meta')->nullable()
-                ->comment('Optional provider payload or annotations for audit.');
-
             $table->timestampsTz();
 
             // Ensure no duplicate snapshot for the same pair and hour
