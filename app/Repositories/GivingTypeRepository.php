@@ -4,62 +4,62 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Models\Tag;
+use App\Models\GivingType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class TagRepository
+class GivingTypeRepository
 {
     /**
-     * @return Collection<int, Tag>
+     * @return Collection<int, GivingType>
      */
     public function all(): Collection
     {
-        return Tag::query()->orderBy('name')->get();
+        return GivingType::query()->orderBy('name')->get();
     }
 
     /**
      * @param bool $onlyTrashed
      *
-     * @return LengthAwarePaginator<Tag>
+     * @return LengthAwarePaginator<GivingType>
      */
     public function paginate(bool $onlyTrashed = false): LengthAwarePaginator
     {
-        $query = Tag::query()->orderBy('name');
+        $query = GivingType::query()->orderBy('name');
         if ($onlyTrashed) {
             $query->onlyTrashed();
         }
         return $query->paginate();
     }
 
-    public function create(array $attributes): Tag
+    public function create(array $attributes): GivingType
     {
-        return Tag::query()->create($attributes);
+        return GivingType::query()->create($attributes);
     }
 
-    public function update(Tag $tag, array $attributes): Tag
+    public function update(GivingType $tag, array $attributes): GivingType
     {
         $tag->update($attributes);
         return $tag;
     }
 
-    public function delete(Tag $tag): bool
+    public function delete(GivingType $tag): bool
     {
         return (bool) $tag->delete();
     }
 
-    public function restore(Tag $tag): bool
+    public function restore(GivingType $tag): bool
     {
         return (bool) $tag->restore();
     }
 
     /**
-     * Resolve IDs for given keys, creating missing tags if requested.
+     * Resolve IDs for given keys, creating missing giving types if requested.
      *
      * @param array<int, string> $keys
      * @param bool $createMissing
      *
-     * @return array<int, int> tag IDs
+     * @return array<int, int> giving_type IDs
      */
     public function getIdsForKeys(array $keys, bool $createMissing = true): array
     {
@@ -68,20 +68,20 @@ class TagRepository
             return [];
         }
 
-        $existing = Tag::query()->whereIn('key', $keys)->get(['id', 'key']);
+        $existing = GivingType::query()->whereIn('key', $keys)->get(['id', 'key']);
         $map = [];
-        foreach ($existing as $tag) {
-            $map[$tag->key] = $tag->id;
+        foreach ($existing as $gt) {
+            $map[$gt->key] = $gt->id;
         }
 
         if ($createMissing) {
             $missing = array_values(array_diff($keys, array_keys($map)));
             foreach ($missing as $key) {
-                $tag = Tag::query()->create([
+                $gt = GivingType::query()->create([
                     'key' => $key,
                     'name' => ucfirst(str_replace(['_', '-'], ' ', $key)),
                 ]);
-                $map[$key] = $tag->id;
+                    $map[$key] = $gt->id;
             }
         }
 

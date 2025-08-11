@@ -13,7 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class MemberRepository
 {
     public function __construct(
-        protected TagRepository $tagRepository,
+        protected GivingTypeRepository $tagRepository,
     ) {
     }
 

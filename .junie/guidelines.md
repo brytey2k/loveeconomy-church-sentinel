@@ -65,25 +65,25 @@ Tests are organized into four categories:
 
 1. **Run all tests**:
    ```bash
-   vendor/bin/phpunit
+   vendor/bin/sail artisan test
    ```
 
 2. **Run specific test suite**:
    ```bash
-   vendor/bin/phpunit --testsuite=Unit
-   vendor/bin/phpunit --testsuite=Feature
-   vendor/bin/phpunit --testsuite=Integration
-   vendor/bin/phpunit --testsuite=Contract
+   vendor/bin/sail artisan test --testsuite=Unit
+   vendor/bin/sail artisan test --testsuite=Feature
+   vendor/bin/sail artisan test --testsuite=Integration
+   vendor/bin/sail artisan test --testsuite=Contract
    ```
 
 3. **Run specific test file**:
    ```bash
-   vendor/bin/phpunit tests/Unit/GuidelinesDemoTest.php
+   vendor/bin/sail artisan test tests/Unit/GuidelinesDemoTest.php
    ```
 
 4. **Run specific test method**:
    ```bash
-   vendor/bin/phpunit --filter=test_string_concatenation tests/Unit/GuidelinesDemoTest.php
+   vendor/bin/sail artisan test --filter=test_string_concatenation tests/Unit/GuidelinesDemoTest.php
    ```
 
 ### Adding New Tests

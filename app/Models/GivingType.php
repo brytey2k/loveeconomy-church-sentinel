@@ -7,11 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * @deprecated Use App\\Models\\GivingType instead. This class proxies to the new table/relations
- *             to maintain backward compatibility during the transition.
- */
-class Tag extends Model
+class GivingType extends Model
 {
     use SoftDeletes;
 
@@ -25,7 +21,7 @@ class Tag extends Model
     ];
 
     /**
-     * Members that have this tag (giving type).
+     * Members that have this giving type.
      */
     public function members()
     {

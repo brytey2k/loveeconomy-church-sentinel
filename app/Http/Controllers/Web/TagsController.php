@@ -8,7 +8,7 @@ use App\Data\CreateTagData;
 use App\Data\UpdateTagData;
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
-use App\Repositories\TagRepository;
+use App\Repositories\GivingTypeRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,7 +17,7 @@ use Inertia\Response;
 class TagsController extends Controller
 {
     public function __construct(
-        protected TagRepository $tagRepository,
+        protected GivingTypeRepository $tagRepository,
     ) {
     }
 

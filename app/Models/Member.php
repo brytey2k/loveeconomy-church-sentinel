@@ -58,10 +58,18 @@ class Member extends Model
     }
 
     /**
-     * Dynamic tags associated with this member.
+     * Giving types associated with this member.
+     */
+    public function givingTypes()
+    {
+        return $this->belongsToMany(GivingType::class, 'church.member_giving_types', 'member_id', 'giving_type_id');
+    }
+
+    /**
+     * Deprecated alias for givingTypes(). Will be removed after full migration away from tags.
      */
     public function tags()
     {
-        return $this->belongsToMany(Tag::class, 'church.member_tags', 'member_id', 'tag_id');
+        return $this->givingTypes();
     }
 }

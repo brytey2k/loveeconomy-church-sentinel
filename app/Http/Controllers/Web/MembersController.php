@@ -11,7 +11,7 @@ use App\Models\Member;
 use App\Repositories\MemberRepository;
 use App\Repositories\PositionsRepository;
 use App\Repositories\Structure\BranchesRepository;
-use App\Repositories\TagRepository;
+use App\Repositories\GivingTypeRepository;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,10 +19,10 @@ use Inertia\Response;
 class MembersController extends Controller
 {
     public function __construct(
-        protected MemberRepository $memberRepository,
-        protected BranchesRepository $branchesRepository,
-        protected PositionsRepository $positionsRepository,
-        protected TagRepository $tagRepository,
+        protected MemberRepository     $memberRepository,
+        protected BranchesRepository   $branchesRepository,
+        protected PositionsRepository  $positionsRepository,
+        protected GivingTypeRepository $tagRepository,
     ) {
     }
 
