@@ -71,6 +71,7 @@ function restoreGivingType(id) {
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Contribution Type</th>
+                                        <th>Auto Assignable</th>
                                         <th v-if="!props.showingTrashed">Actions</th>
                                         <th v-else>Restore</th>
                                     </tr>
@@ -82,6 +83,9 @@ function restoreGivingType(id) {
                                         <td>{{ gt.name }}</td>
                                         <td>{{ gt.description || '-' }}</td>
                                         <td>{{ gt.contribution_type }}</td>
+                                        <td>
+                                            <span class="badge" :class="gt.auto_assignable ? 'badge-info' : 'badge-secondary'">{{ gt.auto_assignable ? 'Yes' : 'No' }}</span>
+                                        </td>
                                         <td v-if="!props.showingTrashed">
                                             <Link :href="`/giving-types/${gt.id}/edit`" class="btn btn-info btn-sm mr-2">
                                                 <i class="fas fa-pencil-alt"></i> Edit

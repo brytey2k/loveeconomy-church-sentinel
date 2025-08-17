@@ -29,6 +29,14 @@ function deleteSystem(id) {
                 <div class="col-12">
                     <Card :with-card-header="true" card-title="Giving Type Systems">
                         <template #card-body>
+                            <div>
+                                <Link href="/giving-types" class="btn btn-default float-right mt-4 mx-3 mb-1 mr-2">
+                                    <i class="fas fa-arrow-left"></i> Back to Giving Types
+                                </Link>
+                                <Link v-if="givingTypeId" :href="`/giving-types/${givingTypeId}/giving-type-systems/create`" class="btn btn-primary float-right mt-4 mx-3 mb-1">
+                                    <i class="fas fa-plus"></i> Add Giving Type System
+                                </Link>
+                            </div>
                             <div class="card-body table-responsive p-0">
                                 <table class="table table-hover text-nowrap">
                                     <thead>
@@ -40,6 +48,7 @@ function deleteSystem(id) {
                                         <th>Amount Low</th>
                                         <th>Amount High</th>
                                         <th>Assignable</th>
+                                        <th>Auto Assignable</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -53,6 +62,9 @@ function deleteSystem(id) {
                                         <td>{{ s.amount_high }}</td>
                                         <td>
                                             <span class="badge" :class="s.assignable ? 'badge-success' : 'badge-secondary'">{{ s.assignable ? 'Yes' : 'No' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" :class="s.auto_assignable ? 'badge-info' : 'badge-secondary'">{{ s.auto_assignable ? 'Yes' : 'No' }}</span>
                                         </td>
                                         <td>
                                             <Link :href="`/giving-type-systems/${s.id}/edit`" class="btn btn-info btn-sm mr-2">
