@@ -9,12 +9,14 @@ use App\Http\Controllers\Web\BranchesController;
 use App\Http\Controllers\Web\CountriesController;
 use App\Http\Controllers\Web\CurrenciesController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\GivingTypesController;
+use App\Http\Controllers\Web\GivingTypeSystemsController;
 use App\Http\Controllers\Web\LevelsController;
+use App\Http\Controllers\Web\MemberGivingsController;
 use App\Http\Controllers\Web\MembersController;
 use App\Http\Controllers\Web\PermissionsController;
 use App\Http\Controllers\Web\PositionsController;
 use App\Http\Controllers\Web\RolesController;
-use App\Http\Controllers\Web\GivingTypesController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['guest'])->group(static function () {
@@ -37,7 +39,21 @@ Route::middleware(['auth'])->group(static function () {
     Route::resource('/countries', CountriesController::class)->names('countries');
     Route::resource('/currencies', CurrenciesController::class)->names('currencies');
     Route::resource('/members', MembersController::class)->names('members');
+
+    // Member-specific giving management routes
+    Route::get('/members/{member}/givings', [MemberGivingsController::class, 'show'])->name('members.givings');
+    Route::post('/members/{member}/giving-types/{givingType}/systems', [MemberGivingsController::class, 'updateSystems'])->name('members.giving-types.systems.update');
+
     Route::resource('/positions', PositionsController::class)->names('positions');
     Route::post('/giving-types/{givingType}/restore', [GivingTypesController::class, 'restore'])->name('giving-types.restore');
     Route::resource('/giving-types', GivingTypesController::class)->names('giving-types');
+
+    // Nested routes for Giving Type Systems scoped by Giving Type (route param)
+    Route::get('/giving-types/{givingType}/giving-type-systems', [GivingTypeSystemsController::class, 'index'])->name('giving-type-systems.index-for-type');
+    Route::get('/giving-types/{givingType}/giving-type-systems/create', [GivingTypeSystemsController::class, 'create'])->name('giving-type-systems.create-for-type');
+
+    // Resource routes for Giving Type Systems (unscoped)
+    Route::resource('/giving-type-systems', GivingTypeSystemsController::class)
+        ->names('giving-type-systems')
+        ->except(['create']);
 });

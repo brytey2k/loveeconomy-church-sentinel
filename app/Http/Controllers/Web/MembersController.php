@@ -8,10 +8,10 @@ use App\Data\CreateMemberData;
 use App\Data\UpdateMemberData;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
+use App\Repositories\GivingTypeRepository;
 use App\Repositories\MemberRepository;
 use App\Repositories\PositionsRepository;
 use App\Repositories\Structure\BranchesRepository;
-use App\Repositories\GivingTypeRepository;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,9 +19,9 @@ use Inertia\Response;
 class MembersController extends Controller
 {
     public function __construct(
-        protected MemberRepository     $memberRepository,
-        protected BranchesRepository   $branchesRepository,
-        protected PositionsRepository  $positionsRepository,
+        protected MemberRepository $memberRepository,
+        protected BranchesRepository $branchesRepository,
+        protected PositionsRepository $positionsRepository,
         protected GivingTypeRepository $tagRepository,
     ) {
     }
@@ -44,7 +44,7 @@ class MembersController extends Controller
         return Inertia::render('Members/Create', [
             'branches' => $this->branchesRepository->all(),
             'positions' => $this->positionsRepository->all(),
-            'tags' => $this->tagRepository->all(),
+            'tags' => $this->tagRepository->allIndividual(),
         ]);
     }
 
@@ -55,9 +55,12 @@ class MembersController extends Controller
      */
     public function store(CreateMemberData $memberData): RedirectResponse
     {
-        $this->memberRepository->create($memberData);
+        $member = $this->memberRepository->create($memberData);
 
-        return redirect()->route('members.index')->with('success', 'Member created successfully.');
+        // After creation and auto-assignments, always redirect to the member givings management page
+        return redirect()
+            ->route('members.givings', ['member' => $member->id])
+            ->with('success', 'Member created successfully. You can now manage giving type systems.');
     }
 
     /**

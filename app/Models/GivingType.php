@@ -42,11 +42,16 @@ class GivingType extends Model
 
     protected $table = 'church.giving_types';
 
+    protected $casts = [
+        'auto_assignable' => 'bool',
+    ];
+
     protected $fillable = [
         'key',
         'name',
         'description',
         'contribution_type',
+        'auto_assignable',
     ];
 
     /**

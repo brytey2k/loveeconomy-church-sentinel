@@ -20,6 +20,8 @@ class FxRatesHistoryRepository
      * - ... (anything else is stored in meta)
      *
      * Returns number of rows inserted.
+     *
+     * @param array $data
      */
     public function persistApiResponse(array $data): int
     {

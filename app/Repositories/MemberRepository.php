@@ -75,9 +75,35 @@ class MemberRepository
 
         $member = Member::query()->create($payload);
 
-        $tagIds = $this->tagRepository->getIdsForKeys($data->tags, createMissing: true);
-        if ($tagIds !== []) {
-            $member->tags()->sync($tagIds);
+        // 1) Resolve IDs for incoming giving type keys (defensive cast to array)
+        $incomingKeys = is_array($data->tags) ? $data->tags : (($data->tags !== null && $data->tags !== '') ? [$data->tags] : []);
+        $tagIds = $this->tagRepository->getIdsForKeys($incomingKeys, createMissing: true);
+
+        // 2) Merge in auto-assignable giving types (server-side enforcement)
+        $autoAssignableIds = \App\Models\GivingType::query()
+            ->where('auto_assignable', true)
+            ->pluck('id')
+            ->all();
+
+        $mergedTagIds = array_values(array_unique(array_merge($tagIds, $autoAssignableIds)));
+
+        if ($mergedTagIds !== []) {
+            // Use sync to ensure current state; we included user selection + auto-assignables
+            $member->givingTypes()->sync($mergedTagIds);
+        }
+
+        // 3) Attach auto-assignable Giving Type Systems for the auto-assignable giving types
+        if ($autoAssignableIds !== []) {
+            $systemIds = \App\Models\GivingTypeSystem::query()
+                ->whereIn('giving_type_id', $autoAssignableIds)
+                ->where('assignable', true)
+                ->where('auto_assignable', true)
+                ->pluck('id')
+                ->all();
+
+            if ($systemIds !== []) {
+                $member->givingTypeSystems()->syncWithoutDetaching($systemIds);
+            }
         }
 
         return $member;
@@ -100,8 +126,33 @@ class MemberRepository
         ];
         $member->update($payload);
 
-        $tagIds = $this->tagRepository->getIdsForKeys($data->tags, createMissing: true);
-        $member->tags()->sync($tagIds);
+        // 1) Resolve IDs for incoming giving type keys (defensive cast to array)
+        $incomingKeys = is_array($data->tags) ? $data->tags : (($data->tags !== null && $data->tags !== '') ? [$data->tags] : []);
+        $tagIds = $this->tagRepository->getIdsForKeys($incomingKeys, createMissing: true);
+
+        // 2) Merge in auto-assignable giving types
+        $autoAssignableIds = \App\Models\GivingType::query()
+            ->where('auto_assignable', true)
+            ->pluck('id')
+            ->all();
+
+        $mergedTagIds = array_values(array_unique(array_merge($tagIds, $autoAssignableIds)));
+
+        $member->tags()->sync($mergedTagIds);
+
+        // 3) Ensure auto-assignable systems are attached
+        if ($autoAssignableIds !== []) {
+            $systemIds = \App\Models\GivingTypeSystem::query()
+                ->whereIn('giving_type_id', $autoAssignableIds)
+                ->where('assignable', true)
+                ->where('auto_assignable', true)
+                ->pluck('id')
+                ->all();
+
+            if ($systemIds !== []) {
+                $member->givingTypeSystems()->syncWithoutDetaching($systemIds);
+            }
+        }
 
         return $member;
     }

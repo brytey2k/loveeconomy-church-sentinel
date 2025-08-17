@@ -86,6 +86,12 @@ function restoreGivingType(id) {
                                             <Link :href="`/giving-types/${gt.id}/edit`" class="btn btn-info btn-sm mr-2">
                                                 <i class="fas fa-pencil-alt"></i> Edit
                                             </Link>
+                                            <Link :href="`/giving-types/${gt.id}/giving-type-systems`" class="btn btn-secondary btn-sm mr-2">
+                                                <i class="fas fa-eye"></i> View Systems
+                                            </Link>
+                                            <Link :href="`/giving-types/${gt.id}/giving-type-systems/create`" class="btn btn-primary btn-sm mr-2">
+                                                <i class="fas fa-sitemap"></i> Add System
+                                            </Link>
                                             <button @click.prevent="deleteGivingType(`${gt.id}`)" type="button"
                                                     class="btn btn-danger btn-sm">
                                                 <i class="fas fa-trash"></i> Delete

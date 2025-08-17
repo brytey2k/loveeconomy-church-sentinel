@@ -121,7 +121,13 @@ import {Link} from '@inertiajs/vue3';
                     <li class="nav-item">
                         <Link href="/giving-types" class="nav-link">
                             <i class="nav-icon fas fa-tags"></i>
-                            <p>Tags</p>
+                            <p>Giving Types</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link href="/giving-type-systems" class="nav-link">
+                            <i class="nav-icon fas fa-sitemap"></i>
+                            <p>Giving Type Systems</p>
                         </Link>
                     </li>
                     <li class="nav-item">

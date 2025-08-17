@@ -63,7 +63,7 @@ function deleteMember(memberId) {
                                         <th>Phone</th>
                                         <th>Branch</th>
                                         <th>Position</th>
-                                        <th>Tags</th>
+                                        <th>Giving Types</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>

@@ -15,6 +15,7 @@ class CreateGivingTypeData extends Data
         public string $name,
         public string|null $description,
         public string $contribution_type = 'individual',
+        public bool $auto_assignable = false,
     ) {
     }
 
@@ -28,6 +29,7 @@ class CreateGivingTypeData extends Data
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'contribution_type' => ['required', 'string'],
+            'auto_assignable' => ['required', 'boolean'],
         ];
     }
 }

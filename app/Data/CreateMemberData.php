@@ -7,6 +7,8 @@ namespace App\Data;
 use App\Models\Branch;
 use App\Models\Position;
 use Illuminate\Validation\Rule;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Data;
 
 class CreateMemberData extends Data
@@ -22,6 +24,8 @@ class CreateMemberData extends Data
          *
          * @var array<int, string>
          */
+        #[Present]
+        #[ArrayType]
         public array $tags = [],
     ) {
     }
@@ -37,8 +41,8 @@ class CreateMemberData extends Data
             'phone' => ['required', 'string', 'max:20'],
             'branch_id' => ['required', 'integer', Rule::exists(Branch::class, 'id')],
             'position_id' => ['required', 'integer', Rule::exists(Position::class, 'id')],
-            'tags' => ['array'],
-            'tags.*' => ['string', 'max:100'],
+            'tags' => ['present', 'array'],
+            'tags.*' => ['string', 'max:100', 'distinct'],
         ];
     }
 }

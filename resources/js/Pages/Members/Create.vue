@@ -3,6 +3,7 @@ import AuthLayout from "../../Layouts/AuthLayout.vue";
 import {Link, useForm} from "@inertiajs/vue3";
 import Card from "../../Components/Card.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
+import { onMounted } from "vue";
 
 const props = defineProps({
     branches: Array,
@@ -17,6 +18,19 @@ const form = useForm({
     branch_id: '',
     position_id: '',
     tags: [], // array of tag keys
+});
+
+// Preselect auto-assignable giving types and keep them locked
+onMounted(() => {
+    const autoKeys = (props.tags || [])
+        .filter(t => t && t.auto_assignable === true)
+        .map(t => t.key);
+    if (autoKeys.length) {
+        // Ensure uniqueness and preserve any already selected values
+        const current = new Set(form.tags);
+        autoKeys.forEach(k => current.add(k));
+        form.tags = Array.from(current);
+    }
 });
 
 function saveMember() {
@@ -99,10 +113,10 @@ function saveMember() {
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label>Tags</label>
+                                                <label>Giving Types</label>
                                                 <div class="d-flex flex-wrap">
                                                     <div class="custom-control custom-checkbox mr-4 mb-2" v-for="tag in props.tags" :key="tag.id">
-                                                        <input class="custom-control-input" type="checkbox" :id="`tag_${tag.id}`" :value="tag.key" v-model="form.tags">
+                                                        <input class="custom-control-input" type="checkbox" :id="`tag_${tag.id}`" :value="tag.key" v-model="form.tags" :disabled="tag.auto_assignable" :title="tag.auto_assignable ? 'Auto-assignable giving type' : ''">
                                                         <label class="custom-control-label" :for="`tag_${tag.id}`">{{ tag.name }}</label>
                                                     </div>
                                                 </div>

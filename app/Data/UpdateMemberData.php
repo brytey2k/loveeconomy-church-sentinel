@@ -9,6 +9,8 @@ use App\Models\Member;
 use App\Models\Position;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
@@ -27,6 +29,8 @@ class UpdateMemberData extends Data
          *
          * @var array<int, string>
          */
+        #[Present]
+        #[ArrayType]
         public array $tags = [],
     ) {
     }
@@ -68,10 +72,10 @@ class UpdateMemberData extends Data
                 Rule::exists(Position::class, 'id'),
             ],
             'tags' => [
-                'array',
+                'present', 'array',
             ],
             'tags.*' => [
-                'string', 'max:100'
+                'string', 'max:100', 'distinct'
             ],
         ];
     }

@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->text('description')->nullable();
             // String-backed contribution type; values should come from App\Enums\ContributionType
             $table->string('contribution_type')->default(ContributionType::INDIVIDUAL->value);
+            $table->boolean('auto_assignable')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

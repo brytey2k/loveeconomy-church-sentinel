@@ -28,7 +28,6 @@ return new class () extends Migration {
             $table->string('payment_type')->nullable()->comment('whether momo, card, etc');
             $table->string('session_id')->nullable()->comment('session id if it was a ussd transaction');
 
-
             // Core monetary fields
             $table->bigInteger('amount_raw')
                 ->comment('Original amount stored in minor units (integer). Example: GHS 12.34 => 1234. Avoid floats.');

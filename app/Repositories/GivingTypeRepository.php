@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Enums\ContributionType;
 use App\Models\GivingType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -16,6 +17,17 @@ class GivingTypeRepository
     public function all(): Collection
     {
         return GivingType::query()->orderBy('name')->get();
+    }
+
+    /**
+     * @return Collection<int, GivingType>
+     */
+    public function allIndividual(): Collection
+    {
+        return GivingType::query()
+            ->where('contribution_type', ContributionType::INDIVIDUAL->value)
+            ->orderBy('name')
+            ->get();
     }
 
     /**
@@ -81,7 +93,7 @@ class GivingTypeRepository
                     'key' => $key,
                     'name' => ucfirst(str_replace(['_', '-'], ' ', $key)),
                 ]);
-                    $map[$key] = $gt->id;
+                $map[$key] = $gt->id;
             }
         }
 

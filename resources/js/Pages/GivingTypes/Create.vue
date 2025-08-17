@@ -9,6 +9,7 @@ const form = useForm({
     name: '',
     description: '',
     contribution_type: 'individual',
+    auto_assignable: false,
 });
 
 function saveGivingType() {
@@ -69,6 +70,16 @@ function saveGivingType() {
                                                     <option value="church">Church</option>
                                                 </select>
                                                 <span class="error invalid-feedback" v-if="form.errors.contribution_type">{{ form.errors.contribution_type }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Auto Assignable</label>
+                                                <select class="form-control" v-model="form.auto_assignable">
+                                                    <option :value="false">No</option>
+                                                    <option :value="true">Yes</option>
+                                                </select>
+                                                <span class="error invalid-feedback" v-if="form.errors.auto_assignable">{{ form.errors.auto_assignable }}</span>
                                             </div>
                                         </div>
                                     </div>

@@ -87,4 +87,13 @@ class Member extends Model
     {
         return $this->givingTypes();
     }
+
+    /**
+     * Giving type systems assigned to this member.
+     */
+    public function givingTypeSystems()
+    {
+        return $this->belongsToMany(GivingTypeSystem::class, 'church.member_giving_type_systems', 'member_id', 'giving_type_system_id')
+            ->withTimestamps();
+    }
 }

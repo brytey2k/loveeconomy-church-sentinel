@@ -17,15 +17,20 @@ use Illuminate\Support\Facades\Log;
 
 class FetchFxRatesJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public function __construct(
-        public ?string $source = null
+        public string|null $source = null
     ) {
     }
 
     /**
      * Execute the job.
+     *
+     * @param FxRatesHistoryRepository $fxRatesHistoryRepository
      *
      * @throws Exception
      */

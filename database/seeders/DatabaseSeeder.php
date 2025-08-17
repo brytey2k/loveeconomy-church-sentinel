@@ -197,15 +197,15 @@ class DatabaseSeeder extends Seeder
 
             // Attach some giving types
             $attachKeys = match ($m['position']) {
-                'Pastor' => ['tithing', 'offering'],
+                'Pastor' => ['tithing', 'partnership'],
                 'MC Head' => ['partnership', 'seed_sowing'],
                 'Cell Shepherd' => ['tithing', 'first_fruit'],
-                'Shepherd' => ['offering', 'seed_sowing'],
-                default => ['offering'],
+                'Shepherd' => ['seed_sowing'],
+                default => ['tithing'],
             };
 
             $ids = collect($attachKeys)
-                ->map(fn ($k) => $givingTypes[$k] ?? null)
+                ->map(static fn ($k) => $givingTypes[$k] ?? null)
                 ->filter()
                 ->values()
                 ->all();
