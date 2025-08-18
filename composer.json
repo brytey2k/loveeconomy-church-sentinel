@@ -20,6 +20,7 @@
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "moneyphp/money": "^4.7",
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-permission": "^6.20",
         "tpetry/laravel-postgresql-enhanced": "^3.0",

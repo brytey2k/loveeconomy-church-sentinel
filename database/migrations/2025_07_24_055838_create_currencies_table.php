@@ -15,8 +15,7 @@ return new class () extends Migration {
         Schema::create('finance.currencies', static function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('short_name');
-            $table->string('symbol');
+            $table->string('short_name')->unique();
             $table->softDeletes();
             $table->timestamps();
         });

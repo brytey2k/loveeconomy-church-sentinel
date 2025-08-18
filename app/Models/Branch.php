@@ -70,7 +70,7 @@ class Branch extends Model implements LTreeModelInterface
 
     protected $table = 'organization.branches';
 
-    protected $fillable = ['name', 'level_id', 'country_id', 'parent_id', 'path'];
+    protected $fillable = ['name', 'level_id', 'country_id', 'currency', 'parent_id', 'path'];
 
     public function level(): BelongsTo
     {

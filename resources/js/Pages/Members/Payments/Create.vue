@@ -9,6 +9,8 @@ const props = defineProps({
   member: Object,
   givingTypes: Array,
   systemsByGivingType: Object,
+  currencies: Array,
+  reportingCurrency: String,
 })
 
 const form = reactive({
@@ -18,6 +20,7 @@ const form = reactive({
   month_paid_for: null, // 1..12
   year_paid_for: new Date().getFullYear(),
   amount: null,
+  currency_code: null,
 })
 
 const systemsForSelectedType = computed(() => {
@@ -44,6 +47,19 @@ const months = [
   { value: 11, label: 'November' },
   { value: 12, label: 'December' },
 ]
+
+// Derived helpers
+const selectedCurrency = computed(() => {
+  if (!form.currency_code) return null
+  return props.currencies?.find(c => c.code === form.currency_code) || null
+})
+
+const convertedAmount = computed(() => {
+  const amt = Number(form.amount)
+  const cur = selectedCurrency.value
+  if (!cur || !cur.rate_to_reporting || !isFinite(amt)) return null
+  return amt * Number(cur.rate_to_reporting)
+})
 
 // For now, we skip submission per requirements
 function submit() {
@@ -111,9 +127,60 @@ function submit() {
                     </div>
                   </div>
 
-                  <div class="form-group">
-                    <label class="block font-medium">Amount</label>
-                    <input type="number" step="0.01" min="0" v-model.number="form.amount" class="form-control" placeholder="0.00" />
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label class="block font-medium">Amount</label>
+                      <input type="number" step="0.01" min="0" v-model.number="form.amount" class="form-control" placeholder="0.00" />
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label class="block font-medium">Currency</label>
+                      <select v-model="form.currency_code" class="form-control">
+                        <option value="" disabled selected>Select currency</option>
+                        <option
+                          v-for="cur in currencies"
+                          :key="cur.code"
+                          :value="cur.code"
+                          :data-rate-to-reporting="cur.rate_to_reporting ?? ''"
+                          :data-base-reporting-to-quote-rate="cur.base_reporting_to_quote_rate ?? ''"
+                        >
+                          {{ cur.code }} — {{ cur.name }}
+                          <span v-if="cur.rate_to_reporting"> (1 {{ cur.code }} ≈ {{ Number(cur.rate_to_reporting).toFixed(6) }} {{ reportingCurrency }})</span>
+                          <span v-else> — rate unavailable</span>
+                        </option>
+                      </select>
+                      <small v-if="selectedCurrency && selectedCurrency.as_of_hour" class="text-muted">
+                        Rate as of: {{ new Date(selectedCurrency.as_of_hour).toLocaleString() }}
+                      </small>
+                    </div>
+                  </div>
+
+                  <div v-if="convertedAmount !== null" class="alert alert-info">
+                    <strong>Converted:</strong>
+                    {{ Number(form.amount).toFixed(2) }} {{ form.currency_code }} ≈ {{ Number(convertedAmount).toFixed(2) }} {{ reportingCurrency }}
+                  </div>
+
+                  <div v-if="convertedAmount !== null" class="mt-3">
+                    <h5 class="mb-2">Account Transactions (preview)</h5>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Detail</th>
+                            <th class="text-right">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Original Amount</td>
+                            <td class="text-right">{{ Number(form.amount).toFixed(2) }} {{ form.currency_code }}</td>
+                          </tr>
+                          <tr>
+                            <td>Reporting Currency Amount ({{ reportingCurrency }})</td>
+                            <td class="text-right">{{ Number(convertedAmount).toFixed(2) }} {{ reportingCurrency }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
                   <div class="mt-4">

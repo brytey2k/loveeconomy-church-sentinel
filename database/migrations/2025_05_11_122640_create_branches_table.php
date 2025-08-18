@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->string('name');
             $table->foreignId('level_id')->constrained('organization.levels')->noActionOnDelete();
             $table->foreignId('country_id')->constrained('organization.countries')->noActionOnDelete();
+            $table->string('currency', 3)->default('GHS');
             $table->bigInteger('parent_id')->nullable();
             $table->labelTree('path');
             $table->softDeletes();

@@ -12,6 +12,8 @@ use App\Repositories\GivingTypeRepository;
 use App\Repositories\MemberRepository;
 use App\Repositories\PositionsRepository;
 use App\Repositories\Structure\BranchesRepository;
+use App\Repositories\CurrencyRepository;
+use App\Models\FxRateHistory;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,6 +25,7 @@ class MembersController extends Controller
         protected BranchesRepository $branchesRepository,
         protected PositionsRepository $positionsRepository,
         protected GivingTypeRepository $tagRepository,
+        protected CurrencyRepository $currencyRepository,
     ) {
     }
 
@@ -50,6 +53,54 @@ class MembersController extends Controller
             ];
         }
 
+        // Build currency dropdown with FX rate to reporting currency
+        $reportingCurrency = config()->string('fx.reporting_currency');
+        $currencies = $this->currencyRepository->all();
+
+        $currenciesWithRates = [];
+        foreach ($currencies as $cur) {
+            $code = $cur->short_name; // ISO code like USD, GHS
+            $latest = null;
+            $rawRate = null; // base (reporting) -> quote (currency)
+            $asOf = null;
+
+            if (strtoupper($code) === strtoupper($reportingCurrency)) {
+                $rawRate = 1.0;
+                $asOf = now();
+            } else {
+                $latest = FxRateHistory::query()
+                    ->where('base_currency', strtoupper($reportingCurrency))
+                    ->where('quote_currency', strtoupper($code))
+                    ->orderByDesc('as_of_hour')
+                    ->select(['rate', 'as_of_hour'])
+                    ->first();
+
+                if ($latest) {
+                    $rawRate = (float) $latest->rate; // 1 reporting -> rawRate quote
+                    $asOf = $latest->as_of_hour;
+                }
+            }
+
+            // rate_to_reporting: how many reporting currency units per 1 unit of this currency
+            $rateToReporting = null;
+            if ($rawRate !== null && $rawRate > 0) {
+                // If code === reporting, rateToReporting = 1
+                $rateToReporting = strtoupper($code) === strtoupper($reportingCurrency)
+                    ? 1.0
+                    : 1.0 / $rawRate;
+            }
+
+            $currenciesWithRates[] = [
+                'id' => $cur->id,
+                'code' => $code,
+                'name' => $cur->name,
+                'symbol' => $cur->symbol,
+                'rate_to_reporting' => $rateToReporting, // null if unavailable
+                'base_reporting_to_quote_rate' => $rawRate, // raw DB direction
+                'as_of_hour' => $asOf,
+            ];
+        }
+
         return Inertia::render('Members/Payments/Create', [
             'member' => [
                 'id' => $member->id,
@@ -58,6 +109,8 @@ class MembersController extends Controller
             ],
             'givingTypes' => $givingTypes,
             'systemsByGivingType' => $systemsByGivingType,
+            'reportingCurrency' => $reportingCurrency,
+            'currencies' => $currenciesWithRates,
         ]);
     }
 

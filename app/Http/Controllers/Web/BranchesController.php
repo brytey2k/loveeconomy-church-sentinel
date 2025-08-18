@@ -27,6 +27,7 @@ class BranchesController extends Controller
         protected CountriesRepository $countriesRepository,
         protected GivingTypeRepository $givingTypeRepository,
         protected BranchGivingAssignmentRepository $branchGivingAssignmentRepository,
+        protected \App\Repositories\CurrencyRepository $currencyRepository,
     ) {
     }
 
@@ -50,6 +51,7 @@ class BranchesController extends Controller
             'countries' => $this->countriesRepository->all(),
             'branches' => $this->branchesRepository->all(),
             'tags' => $this->givingTypeRepository->allChurch(),
+            'currencies' => $this->currencyRepository->all(),
         ]);
     }
 
@@ -84,6 +86,7 @@ class BranchesController extends Controller
             'countries' => Country::all(),
             'branches' => $this->branchesRepository->allExcept(ids: [$branch->id]),
             'tags' => $this->givingTypeRepository->allChurch(),
+            'currencies' => $this->currencyRepository->all(),
         ]);
     }
 

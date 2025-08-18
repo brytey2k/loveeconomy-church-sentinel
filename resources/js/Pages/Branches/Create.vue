@@ -10,6 +10,7 @@ const props = defineProps({
     countries: Array,
     branches: Array,
     tags: Array,
+    currencies: Array,
 });
 
 const form = useForm({
@@ -17,6 +18,7 @@ const form = useForm({
     level_id: '',
     country_id: '',
     parent_id: '',
+    currency: 'GHS',
     giving_type_keys: [], // array of giving type keys (church)
 });
 
@@ -90,6 +92,21 @@ function saveBranch() {
                                                 <span class="error invalid-feedback" v-if="form.errors.country_id">{{ form.errors.country_id }}</span>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Currency</label>
+                                                <select class="form-control" v-model="form.currency" required :class="{ 'is-invalid': form.errors.currency }">
+                                                    <option value="">Select Currency</option>
+                                                    <option v-for="c in props.currencies" :key="c.id" :value="c.short_name">
+                                                        {{ c.name }} ({{ c.short_name }})
+                                                    </option>
+                                                </select>
+                                                <span class="error invalid-feedback" v-if="form.errors.currency">{{ form.errors.currency }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Parent Branch</label>
