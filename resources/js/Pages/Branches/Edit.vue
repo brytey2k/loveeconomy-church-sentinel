@@ -9,6 +9,7 @@ const props = defineProps({
     levels: Array,
     countries: Array,
     branches: Array,
+    tags: Array,
 });
 
 const form = useForm({

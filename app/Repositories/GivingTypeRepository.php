@@ -22,6 +22,17 @@ class GivingTypeRepository
     /**
      * @return Collection<int, GivingType>
      */
+    public function allChurch(): Collection
+    {
+        return GivingType::query()
+            ->where('contribution_type', ContributionType::CHURCH->value)
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * @return Collection<int, GivingType>
+     */
     public function allIndividual(): Collection
     {
         return GivingType::query()

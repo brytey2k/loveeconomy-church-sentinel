@@ -45,6 +45,11 @@ Route::middleware(['auth'])->group(static function () {
     Route::post('/members/{member}/giving-types', [MemberGivingsController::class, 'updateGivingTypes'])->name('members.giving-types.update');
     Route::post('/members/{member}/giving-types/{givingType}/systems', [MemberGivingsController::class, 'updateSystems'])->name('members.giving-types.systems.update');
 
+    // Branch-specific giving management routes
+    Route::get('/branches/{branch}/givings', [App\Http\Controllers\Web\BranchGivingsController::class, 'show'])->name('branches.givings');
+    Route::post('/branches/{branch}/giving-types', [App\Http\Controllers\Web\BranchGivingsController::class, 'updateGivingTypes'])->name('branches.giving-types.update');
+    Route::post('/branches/{branch}/giving-types/{givingType}/systems', [App\Http\Controllers\Web\BranchGivingsController::class, 'updateSystems'])->name('branches.giving-types.systems.update');
+
     Route::resource('/positions', PositionsController::class)->names('positions');
     Route::post('/giving-types/{givingType}/restore', [GivingTypesController::class, 'restore'])->name('giving-types.restore');
     Route::resource('/giving-types', GivingTypesController::class)->names('giving-types');

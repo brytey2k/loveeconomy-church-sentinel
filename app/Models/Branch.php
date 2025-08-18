@@ -56,6 +56,10 @@ use Umbrellio\LTree\Traits\LTreeModelTrait;
  *
  * @property-read Country $country
  * @property-read Level $level
+ * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, GivingTypeSystem> $givingTypeSystems
+ * @property-read int|null $giving_type_systems_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, GivingType> $givingTypes
+ * @property-read int|null $giving_types_count
  *
  * @mixin \Eloquent
  */
@@ -81,5 +85,21 @@ class Branch extends Model implements LTreeModelInterface
     public function ltreeParent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * Church giving types assigned to this branch.
+     */
+    public function givingTypes()
+    {
+        return $this->belongsToMany(GivingType::class, 'church.branch_giving_types', 'branch_id', 'giving_type_id')->withTimestamps();
+    }
+
+    /**
+     * Church giving type systems assigned to this branch.
+     */
+    public function givingTypeSystems()
+    {
+        return $this->belongsToMany(GivingTypeSystem::class, 'church.branch_giving_type_systems', 'branch_id', 'giving_type_system_id')->withTimestamps();
     }
 }

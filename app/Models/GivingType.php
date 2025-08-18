@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Member> $members
- * @property-read int|null $members_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingType newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingType newQuery()
@@ -33,6 +31,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingType whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingType withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingType withoutTrashed()
+ *
+ * @property bool $auto_assignable
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Member> $members
+ * @property-read int|null $members_count
+ * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, Branch> $branches
+ * @property-read int|null $branches_count
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingType whereAutoAssignable($value)
  *
  * @mixin \Eloquent
  */
@@ -59,6 +65,15 @@ class GivingType extends Model
      */
     public function members()
     {
-        return $this->belongsToMany(Member::class, 'church.member_giving_types', 'giving_type_id', 'member_id');
+        return $this->belongsToMany(Member::class, 'church.member_giving_types', 'giving_type_id', 'member_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Branches that have this giving type.
+     */
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class, 'church.branch_giving_types', 'giving_type_id', 'branch_id');
     }
 }

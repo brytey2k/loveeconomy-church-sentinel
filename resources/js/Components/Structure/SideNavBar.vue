@@ -1,5 +1,9 @@
 <script setup>
-import {Link} from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+
+const page = usePage()
+const navGivingTypes = computed(() => page.props?.navGivingTypes ?? [])
 </script>
 
 <template>
@@ -124,11 +128,28 @@ import {Link} from '@inertiajs/vue3';
                             <p>Giving Types</p>
                         </Link>
                     </li>
-                    <li class="nav-item">
-                        <Link href="/giving-type-systems" class="nav-link">
+                    <li class="nav-item has-treeview" :class="{ 'menu-open': (navGivingTypes || []).length > 0 }">
+                        <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-sitemap"></i>
-                            <p>Giving Type Systems</p>
-                        </Link>
+                            <p>
+                                Giving Type Systems
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <Link href="/giving-type-systems" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>All Systems</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-for="gt in navGivingTypes" :key="gt.id">
+                                <Link :href="`/giving-types/${gt.id}/giving-type-systems`" class="nav-link">
+                                    <i class="far fa-dot-circle nav-icon"></i>
+                                    <p>{{ gt.name }}</p>
+                                </Link>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <Link method="post" href="/logout" class="nav-link" as="button">

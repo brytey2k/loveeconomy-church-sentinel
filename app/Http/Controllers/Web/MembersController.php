@@ -32,7 +32,7 @@ class MembersController extends Controller
     public function index(): Response
     {
         return Inertia::render('Members/Index', [
-            'members' => $this->memberRepository->paginate(['branch', 'position', 'tags']),
+            'members' => $this->memberRepository->paginate(['branch', 'position']),
         ]);
     }
 

@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Member> $members
- * @property-read int|null $members_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag newQuery()
@@ -36,6 +34,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag withoutTrashed()
+ *
+ * @property bool $auto_assignable
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Member> $members
+ * @property-read int|null $members_count
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Tag whereAutoAssignable($value)
  *
  * @mixin \Eloquent
  */

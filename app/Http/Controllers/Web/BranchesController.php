@@ -10,7 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Country;
 use App\Models\Level;
+use App\Repositories\BranchGivingAssignmentRepository;
 use App\Repositories\CountriesRepository;
+use App\Repositories\GivingTypeRepository;
 use App\Repositories\Structure\BranchesRepository;
 use App\Repositories\Structure\LevelRepository;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +25,8 @@ class BranchesController extends Controller
         protected BranchesRepository $branchesRepository,
         protected LevelRepository $levelRepository,
         protected CountriesRepository $countriesRepository,
+        protected GivingTypeRepository $givingTypeRepository,
+        protected BranchGivingAssignmentRepository $branchGivingAssignmentRepository,
     ) {
     }
 
@@ -45,6 +49,7 @@ class BranchesController extends Controller
             'levels' => $this->levelRepository->all(),
             'countries' => $this->countriesRepository->all(),
             'branches' => $this->branchesRepository->all(),
+            'tags' => $this->givingTypeRepository->allChurch(),
         ]);
     }
 
@@ -52,12 +57,17 @@ class BranchesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param CreateBranchData $branchData
+     * @param \App\Data\UpdateBranchGivingTypesData $givingData
      */
-    public function store(CreateBranchData $branchData): RedirectResponse
+    public function store(CreateBranchData $branchData, \App\Data\UpdateBranchGivingTypesData $givingData): RedirectResponse
     {
-        $this->branchesRepository->create($branchData);
+        $branch = $this->branchesRepository->create($branchData);
 
-        return redirect()->route('branches.index')->with('success', 'Branch created successfully.');
+        // Sync church giving types for the new branch
+        $this->branchGivingAssignmentRepository->syncGivingTypes($branch, $givingData->giving_type_keys ?? []);
+
+        return redirect()->route('branches.givings', ['branch' => $branch->id])
+            ->with('success', 'Branch created successfully.');
     }
 
     /**
@@ -67,11 +77,13 @@ class BranchesController extends Controller
      */
     public function edit(Branch $branch): Response
     {
+        $branch->load('givingTypes');
         return Inertia::render('Branches/Edit', [
             'branch' => $branch,
             'levels' => Level::all(),
             'countries' => Country::all(),
             'branches' => $this->branchesRepository->allExcept(ids: [$branch->id]),
+            'tags' => $this->givingTypeRepository->allChurch(),
         ]);
     }
 
@@ -80,10 +92,14 @@ class BranchesController extends Controller
      *
      * @param UpdateBranchData $updateBranchData
      * @param Branch $branch
+     * @param \App\Data\UpdateBranchGivingTypesData $givingData
      */
-    public function update(UpdateBranchData $updateBranchData, Branch $branch): RedirectResponse
+    public function update(UpdateBranchData $updateBranchData, Branch $branch, \App\Data\UpdateBranchGivingTypesData $givingData): RedirectResponse
     {
-        $this->branchesRepository->update($branch, $updateBranchData);
+        $branch = $this->branchesRepository->update($branch, $updateBranchData);
+
+        // Sync church giving types after update
+        $this->branchGivingAssignmentRepository->syncGivingTypes($branch, $givingData->giving_type_keys ?? []);
 
         return redirect()->route('branches.index')->with('success', 'Branch updated successfully.');
     }

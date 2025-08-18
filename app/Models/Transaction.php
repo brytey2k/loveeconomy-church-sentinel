@@ -56,6 +56,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereReportingCurrency($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereTxDate($value)
  *
+ * @property int $giving_type_id
+ * @property int|null $giving_type_system_id
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereGivingTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereGivingTypeSystemId($value)
+ *
  * @mixin \Eloquent
  */
 class Transaction extends Model

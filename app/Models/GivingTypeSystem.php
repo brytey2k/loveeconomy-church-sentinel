@@ -17,9 +17,41 @@ use Umbrellio\LTree\Traits\LTreeModelTrait;
  * @property string $amount_low
  * @property string $amount_high
  * @property bool $assignable
+ * @property bool $auto_assignable
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read GivingType $givingType
  * @property-read GivingTypeSystem|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, GivingTypeSystem> $children
+ * @property-read int|null $children_count
+ * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, GivingTypeSystem> $ltreeChildren
+ * @property-read int|null $ltree_children_count
+ * @property-read GivingTypeSystem|null $ltreeParent
+ *
+ * @method static \Umbrellio\LTree\Collections\LTreeCollection<int, static> all($columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem ancestorByLevel(int $level = 1, ?string $path = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem ancestorsOf(\Umbrellio\LTree\Interfaces\LTreeModelInterface $model, bool $reverse = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem descendantsOf(\Umbrellio\LTree\Interfaces\LTreeModelInterface $model, bool $reverse = true)
+ * @method static \Umbrellio\LTree\Collections\LTreeCollection<int, static> get($columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem parentsOf(array $paths)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem root()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereAmountHigh($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereAmountLow($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereAssignable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereAutoAssignable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereGivingTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem wherePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GivingTypeSystem withoutSelf(int $id)
+ *
+ * @mixin \Eloquent
  */
 class GivingTypeSystem extends Model implements LTreeModelInterface
 {

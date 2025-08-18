@@ -8,15 +8,12 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class () extends Migration {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('finance.transactions', static function (Blueprint $table) {
+        Schema::create('finance.church_transactions', static function (Blueprint $table) {
             $table->id();
             $table->dateTimeTz('tx_date')->comment('the actual date and time of the transaction');
-            $table->foreignId('member_id');
+            $table->foreignId('branch_id');
             $table->foreignId('giving_type_id');
             $table->foreignId('giving_type_system_id')->nullable();
             $table->tinyInteger('status')->default(TransactionState::SUCCESSFUL);
@@ -50,14 +47,18 @@ return new class () extends Migration {
                 ->comment('Currency as originally entered by the user (ISO 4217). Useful if parsing differs from stored currency.');
 
             $table->timestampsTz();
+
+            $table->foreign('branch_id')->references('id')->on('organization.branches')->cascadeOnDelete();
+            $table->foreign('giving_type_id')->references('id')->on('church.giving_types');
+            $table->foreign('giving_type_system_id')->references('id')->on('church.giving_type_systems');
+
+            $table->index(['branch_id', 'tx_date']);
+            $table->index(['giving_type_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('finance.transactions');
+        Schema::dropIfExists('finance.church_transactions');
     }
 };

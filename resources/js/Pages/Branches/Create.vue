@@ -3,18 +3,33 @@ import AuthLayout from "../../Layouts/AuthLayout.vue";
 import {Link, useForm} from "@inertiajs/vue3";
 import Card from "../../Components/Card.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
+import { onMounted } from "vue";
 
 const props = defineProps({
     levels: Array,
     countries: Array,
     branches: Array,
+    tags: Array,
 });
 
 const form = useForm({
     name: '',
     level_id: '',
     country_id: '',
-    parent_id: ''
+    parent_id: '',
+    giving_type_keys: [], // array of giving type keys (church)
+});
+
+// Preselect auto-assignable church giving types and keep them locked
+onMounted(() => {
+    const autoKeys = (props.tags || [])
+        .filter(t => t && t.auto_assignable === true)
+        .map(t => t.key);
+    if (autoKeys.length) {
+        const current = new Set(form.giving_type_keys);
+        autoKeys.forEach(k => current.add(k));
+        form.giving_type_keys = Array.from(current);
+    }
 });
 
 function saveBranch() {
@@ -85,6 +100,21 @@ function saveBranch() {
                                                     </option>
                                                 </select>
                                                 <span class="error invalid-feedback" v-if="form.errors.parent_id">{{ form.errors.parent_id }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Church Giving Types</label>
+                                                <div class="d-flex flex-wrap">
+                                                    <div class="custom-control custom-checkbox mr-4 mb-2" v-for="tag in props.tags" :key="tag.id">
+                                                        <input class="custom-control-input" type="checkbox" :id="`tag_${tag.id}`" :value="tag.key" v-model="form.giving_type_keys" :disabled="tag.auto_assignable" :title="tag.auto_assignable ? 'Auto-assignable giving type' : ''">
+                                                        <label class="custom-control-label" :for="`tag_${tag.id}`">{{ tag.name }}</label>
+                                                    </div>
+                                                </div>
+                                                <span class="error invalid-feedback d-block" v-if="form.errors.giving_type_keys">{{ form.errors.giving_type_keys }}</span>
                                             </div>
                                         </div>
                                     </div>

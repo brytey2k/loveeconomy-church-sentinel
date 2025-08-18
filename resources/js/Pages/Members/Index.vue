@@ -63,7 +63,6 @@ function deleteMember(memberId) {
                                         <th>Phone</th>
                                         <th>Branch</th>
                                         <th>Position</th>
-                                        <th>Giving Types</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -76,12 +75,9 @@ function deleteMember(memberId) {
                                         <td>{{ member.branch ? member.branch.name : '-' }}</td>
                                         <td>{{ member.position ? member.position.name : '-' }}</td>
                                         <td>
-                                            <span v-if="member.tags && member.tags.length">
-                                                {{ member.tags.map(t => t.name).join(', ') }}
-                                            </span>
-                                            <span v-else class="text-muted">-</span>
-                                        </td>
-                                        <td>
+                                            <Link :href="`/members/${member.id}/givings`" class="btn btn-secondary btn-sm mr-2">
+                                                <i class="fas fa-donate"></i> Manage Giving Types
+                                            </Link>
                                             <Link :href="`/members/${member.id}/edit`" class="btn btn-info btn-sm mr-2">
                                                 <i class="fas fa-pencil-alt"></i> Edit
                                             </Link>

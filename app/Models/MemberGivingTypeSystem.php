@@ -11,8 +11,20 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $member_id
  * @property int $giving_type_system_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Member $member
  * @property-read GivingTypeSystem $system
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem whereGivingTypeSystemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem whereMemberId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MemberGivingTypeSystem whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
  */
 class MemberGivingTypeSystem extends Model
 {

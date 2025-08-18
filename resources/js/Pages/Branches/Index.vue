@@ -73,6 +73,9 @@ function deleteBranch(branchId) {
                                         <td>{{ branch.country ? branch.country.name : '-' }}</td>
                                         <td>{{ branch.ltree_parent ? branch.ltree_parent.name : '-' }}</td>
                                         <td>
+                                            <Link :href="`/branches/${branch.id}/givings`" class="btn btn-secondary btn-sm mr-2">
+                                                <i class="fas fa-donate"></i> Manage Giving Types
+                                            </Link>
                                             <Link :href="`/branches/${branch.id}/edit`" class="btn btn-info btn-sm mr-2">
                                                 <i class="fas fa-pencil-alt"></i> Edit
                                             </Link>

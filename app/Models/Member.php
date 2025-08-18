@@ -40,6 +40,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Member withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Member withoutTrashed()
  *
+ * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, GivingTypeSystem> $givingTypeSystems
+ * @property-read int|null $giving_type_systems_count
+ *
  * @mixin \Eloquent
  */
 class Member extends Model
@@ -77,7 +80,8 @@ class Member extends Model
      */
     public function givingTypes()
     {
-        return $this->belongsToMany(GivingType::class, 'church.member_giving_types', 'member_id', 'giving_type_id');
+        return $this->belongsToMany(GivingType::class, 'church.member_giving_types', 'member_id', 'giving_type_id')
+            ->withTimestamps();
     }
 
     /**
