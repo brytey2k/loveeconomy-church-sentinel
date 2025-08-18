@@ -8,6 +8,12 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/laravel-shift/laravel-ltree.git"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
@@ -17,7 +23,7 @@
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-permission": "^6.20",
         "tpetry/laravel-postgresql-enhanced": "^3.0",
-        "umbrellio/laravel-ltree": "^8.0"
+        "umbrellio/laravel-ltree": "dev-l12-compatibility"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
