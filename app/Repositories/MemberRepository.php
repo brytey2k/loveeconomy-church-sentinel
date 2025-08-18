@@ -41,7 +41,32 @@ class MemberRepository
      */
     public function paginate(array $relations = []): LengthAwarePaginator
     {
-        return Member::with($relations)->orderBy('first_name')->paginate();
+        return Member::with($relations)
+            ->orderBy('first_name')
+            ->paginate()
+            ->withQueryString();
+    }
+
+    /**
+     * Paginate members filtered by a specific Giving Type.
+     *
+     * @param ?int $givingTypeId
+     * @param ?string $givingTypeKey
+     * @param array<string> $relations
+     */
+    public function paginateByGivingType(int|null $givingTypeId, string|null $givingTypeKey = null, array $relations = []): LengthAwarePaginator
+    {
+        $query = Member::with($relations)
+            ->whereHas('givingTypes', static function ($q) use ($givingTypeId, $givingTypeKey) {
+                if ($givingTypeId !== null) {
+                    $q->whereKey($givingTypeId);
+                } elseif ($givingTypeKey !== null && $givingTypeKey !== '') {
+                    $q->where('key', $givingTypeKey);
+                }
+            })
+            ->orderBy('first_name');
+
+        return $query->paginate()->withQueryString();
     }
 
     /**

@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
     {
         // Share global props with all Inertia responses
         $givingTypes = resolve(GivingTypeRepository::class)
-            ->all()
+            ->allIndividual()
             ->map(static fn (GivingType $gt) => [
                 'id' => $gt->id,
                 'key' => $gt->key,

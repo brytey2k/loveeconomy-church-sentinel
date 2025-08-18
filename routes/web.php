@@ -40,6 +40,9 @@ Route::middleware(['auth'])->group(static function () {
     Route::resource('/currencies', CurrenciesController::class)->names('currencies');
     Route::resource('/members', MembersController::class)->names('members');
 
+    // Member payments
+    Route::get('/members/{member}/payments/create', [MembersController::class, 'createPayment'])->name('members.payments.create');
+
     // Member-specific giving management routes
     Route::get('/members/{member}/givings', [MemberGivingsController::class, 'show'])->name('members.givings');
     Route::post('/members/{member}/giving-types', [MemberGivingsController::class, 'updateGivingTypes'])->name('members.giving-types.update');

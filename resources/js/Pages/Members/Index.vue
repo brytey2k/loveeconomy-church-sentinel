@@ -7,6 +7,7 @@ import {Link, useForm} from "@inertiajs/vue3";
 
 defineProps({
     members: Object,
+    filterGivingType: Object,
 });
 
 function deleteMember(memberId) {
@@ -25,13 +26,13 @@ function deleteMember(memberId) {
 <template>
     <AuthLayout>
         <template #page-title>
-            <h1 class="m-0">Members</h1>
+            <h1 class="m-0">Members<span v-if="filterGivingType && filterGivingType.name"> — {{ filterGivingType.name }}</span></h1>
         </template>
 
         <template #page-content>
             <FluidContainerWithRow>
                 <div class="col-12">
-                    <Card :with-card-header="true" card-title="Members">
+                    <Card :with-card-header="true" :card-title="filterGivingType && filterGivingType.name ? `Members — ${filterGivingType.name}` : 'Members'">
                         <template #card-tools>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm float-right" style="width: 150px;">
@@ -77,6 +78,9 @@ function deleteMember(memberId) {
                                         <td>
                                             <Link :href="`/members/${member.id}/givings`" class="btn btn-secondary btn-sm mr-2">
                                                 <i class="fas fa-donate"></i> Manage Giving Types
+                                            </Link>
+                                            <Link :href="`/members/${member.id}/payments/create`" class="btn btn-success btn-sm mr-2">
+                                                <i class="fas fa-plus-circle"></i> Add Payment
                                             </Link>
                                             <Link :href="`/members/${member.id}/edit`" class="btn btn-info btn-sm mr-2">
                                                 <i class="fas fa-pencil-alt"></i> Edit

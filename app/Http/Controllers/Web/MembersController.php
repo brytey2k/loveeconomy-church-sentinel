@@ -27,12 +27,78 @@ class MembersController extends Controller
     }
 
     /**
+     * Show the form for creating a payment for a specific member.
+     */
+    public function createPayment(Member $member): Response
+    {
+        $member->load(['givingTypes:id,name,key', 'givingTypeSystems:id,name,giving_type_id']);
+
+        // Prepare giving types
+        $givingTypes = $member->givingTypes->map(fn ($gt) => [
+            'id' => $gt->id,
+            'name' => $gt->name,
+            'key' => $gt->key,
+        ])->values();
+
+        // Group assigned systems by giving type id
+        $systemsByGivingType = [];
+        foreach ($member->givingTypeSystems as $sys) {
+            $systemsByGivingType[$sys->giving_type_id] = $systemsByGivingType[$sys->giving_type_id] ?? [];
+            $systemsByGivingType[$sys->giving_type_id][] = [
+                'id' => $sys->id,
+                'name' => $sys->name,
+            ];
+        }
+
+        return Inertia::render('Members/Payments/Create', [
+            'member' => [
+                'id' => $member->id,
+                'first_name' => $member->first_name,
+                'last_name' => $member->last_name,
+            ],
+            'givingTypes' => $givingTypes,
+            'systemsByGivingType' => $systemsByGivingType,
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(): Response
     {
+        $givingTypeId = request()->integer('giving_type_id');
+        $givingTypeKey = request()->string('giving_type_key')->toString();
+
+        $members = null;
+        $filterGivingType = null;
+        if ($givingTypeId || $givingTypeKey) {
+            $members = $this->memberRepository->paginateByGivingType(
+                $givingTypeId ?: null,
+                $givingTypeKey ?: null,
+                ['branch', 'position']
+            );
+
+            // Resolve the current giving type name for the UI title
+            $gtQuery = \App\Models\GivingType::query();
+            if ($givingTypeId) {
+                $gt = $gtQuery->find($givingTypeId);
+            } else {
+                $gt = $gtQuery->where('key', $givingTypeKey)->first();
+            }
+            if ($gt) {
+                $filterGivingType = [
+                    'id' => $gt->id,
+                    'key' => $gt->key,
+                    'name' => $gt->name,
+                ];
+            }
+        } else {
+            $members = $this->memberRepository->paginate(['branch', 'position']);
+        }
+
         return Inertia::render('Members/Index', [
-            'members' => $this->memberRepository->paginate(['branch', 'position']),
+            'members' => $members,
+            'filterGivingType' => $filterGivingType,
         ]);
     }
 
