@@ -6,6 +6,9 @@ namespace App\Repositories;
 
 use App\Data\CreateMemberData;
 use App\Data\UpdateMemberData;
+use App\Enums\ContributionType;
+use App\Models\GivingType;
+use App\Models\GivingTypeSystem;
 use App\Models\Member;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -79,9 +82,19 @@ class MemberRepository
         $incomingKeys = is_array($data->tags) ? $data->tags : (($data->tags !== null && $data->tags !== '') ? [$data->tags] : []);
         $tagIds = $this->tagRepository->getIdsForKeys($incomingKeys, createMissing: true);
 
-        // 2) Merge in auto-assignable giving types (server-side enforcement)
-        $autoAssignableIds = \App\Models\GivingType::query()
+        // Keep only INDIVIDUAL contribution type for any user-selected giving types
+        if ($tagIds !== []) {
+            $tagIds = GivingType::query()
+                ->whereIn('id', $tagIds)
+                ->where('contribution_type', ContributionType::INDIVIDUAL->value)
+                ->pluck('id')
+                ->all();
+        }
+
+        // 2) Merge in auto-assignable giving types (server-side enforcement), only INDIVIDUAL
+        $autoAssignableIds = GivingType::query()
             ->where('auto_assignable', true)
+            ->where('contribution_type', ContributionType::INDIVIDUAL->value)
             ->pluck('id')
             ->all();
 
@@ -92,10 +105,10 @@ class MemberRepository
             $member->givingTypes()->sync($mergedTagIds);
         }
 
-        // 3) Attach auto-assignable Giving Type Systems for the auto-assignable giving types
-        if ($autoAssignableIds !== []) {
-            $systemIds = \App\Models\GivingTypeSystem::query()
-                ->whereIn('giving_type_id', $autoAssignableIds)
+        // 3) Attach auto-assignable Giving Type Systems for ALL assigned INDIVIDUAL giving types
+        if ($mergedTagIds !== []) {
+            $systemIds = GivingTypeSystem::query()
+                ->whereIn('giving_type_id', $mergedTagIds)
                 ->where('assignable', true)
                 ->where('auto_assignable', true)
                 ->pluck('id')
@@ -131,7 +144,7 @@ class MemberRepository
         $tagIds = $this->tagRepository->getIdsForKeys($incomingKeys, createMissing: true);
 
         // 2) Merge in auto-assignable giving types
-        $autoAssignableIds = \App\Models\GivingType::query()
+        $autoAssignableIds = GivingType::query()
             ->where('auto_assignable', true)
             ->pluck('id')
             ->all();
@@ -142,7 +155,7 @@ class MemberRepository
 
         // 3) Ensure auto-assignable systems are attached
         if ($autoAssignableIds !== []) {
-            $systemIds = \App\Models\GivingTypeSystem::query()
+            $systemIds = GivingTypeSystem::query()
                 ->whereIn('giving_type_id', $autoAssignableIds)
                 ->where('assignable', true)
                 ->where('auto_assignable', true)

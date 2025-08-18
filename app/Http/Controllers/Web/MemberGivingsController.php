@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Data\UpdateMemberGivingTypesData;
 use App\Data\UpdateMemberGivingTypeSystemsData;
 use App\Enums\ContributionType;
 use App\Http\Controllers\Controller;
@@ -58,6 +59,12 @@ class MemberGivingsController extends Controller
             ];
         });
 
+        // All individual giving types for editing selection
+        $allIndividualTypes = GivingType::query()
+            ->where('contribution_type', ContributionType::INDIVIDUAL->value)
+            ->orderBy('name')
+            ->get(['id', 'name', 'key', 'auto_assignable']);
+
         return Inertia::render('Members/Givings', [
             'member' => [
                 'id' => $member->id,
@@ -66,6 +73,8 @@ class MemberGivingsController extends Controller
                 'phone' => $member->phone,
             ],
             'givingTypes' => $typesPayload,
+            'allGivingTypes' => $allIndividualTypes,
+            'assignedGivingTypeIds' => $member->givingTypes->pluck('id')->values(),
         ]);
     }
 
@@ -110,5 +119,60 @@ class MemberGivingsController extends Controller
 
         return redirect()->route('members.givings', ['member' => $member->id])
             ->with('success', 'Updated giving type systems.');
+    }
+
+    /**
+     * Update assigned giving types for a member (INDIVIDUAL only) and reconcile systems.
+     *
+     * @param Member $member
+     * @param UpdateMemberGivingTypesData $data
+     */
+    public function updateGivingTypes(Member $member, UpdateMemberGivingTypesData $data): RedirectResponse
+    {
+        // Only allow INDIVIDUAL giving types
+        $allowedGivingTypeIds = GivingType::query()
+            ->where('contribution_type', ContributionType::INDIVIDUAL->value)
+            ->pluck('id')
+            ->all();
+
+        $desired = collect($data->giving_type_ids ?? [])
+            ->map(static fn ($v) => (int) $v)
+            ->intersect($allowedGivingTypeIds)
+            ->values()
+            ->all();
+
+        // Sync giving types
+        $member->givingTypes()->sync($desired);
+
+        // Attach auto-assignable systems for desired giving types
+        if ($desired !== []) {
+            $autoSystemIds = GivingTypeSystem::query()
+                ->whereIn('giving_type_id', $desired)
+                ->where('assignable', true)
+                ->where('auto_assignable', true)
+                ->pluck('id')
+                ->all();
+
+            if ($autoSystemIds !== []) {
+                $member->givingTypeSystems()->syncWithoutDetaching($autoSystemIds);
+            }
+        }
+
+        // Detach systems that belong to giving types no longer assigned
+        if ($desired === []) {
+            // If no giving types desired, remove all systems
+            $member->givingTypeSystems()->detach();
+        } else {
+            $systemIdsToDetach = $member->givingTypeSystems()
+                ->whereNotIn('giving_type_id', $desired)
+                ->pluck('giving_type_systems.id')
+                ->all();
+            if ($systemIdsToDetach !== []) {
+                $member->givingTypeSystems()->detach($systemIdsToDetach);
+            }
+        }
+
+        return redirect()->route('members.givings', ['member' => $member->id])
+            ->with('success', 'Updated giving types.');
     }
 }

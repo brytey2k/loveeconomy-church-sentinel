@@ -4,10 +4,13 @@ import { Link } from "@inertiajs/vue3";
 import Card from "../../Components/Card.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
 import GivingTypeSystemsManager from "../../Components/Members/GivingTypeSystemsManager.vue";
+import GivingTypesEditor from "../../Components/Members/GivingTypesEditor.vue";
 
 const props = defineProps({
     member: Object,
     givingTypes: Array,
+    allGivingTypes: Array,
+    assignedGivingTypeIds: Array,
 });
 </script>
 
@@ -25,18 +28,23 @@ const props = defineProps({
                     </Link>
                 </div>
 
-                <div class="col-12" v-if="(givingTypes || []).length === 0">
-                    <Card :with-card-header="true" card-title="Assigned Giving Types">
+                <div class="col-12">
+                    <Card :with-card-header="true" card-title="Edit Giving Types (Individual)">
                         <template #card-body>
-                            <p>No giving types were assigned to this member.</p>
+                            <div class="card-body">
+                                <GivingTypesEditor :member-id="member.id" :all-giving-types="allGivingTypes" :assigned-giving-type-ids="assignedGivingTypeIds" />
+                            </div>
                         </template>
                     </Card>
                 </div>
 
-                <div class="col-12" v-else>
-                    <Card :with-card-header="true" card-title="Assigned Giving Types (Individual)">
+                <div class="col-12 mt-3">
+                    <Card :with-card-header="true" card-title="Manage Systems for Assigned Types">
                         <template #card-body>
-                            <div class="row">
+                            <div v-if="(givingTypes || []).length === 0" class="alert alert-secondary mb-0">
+                                No giving types were assigned to this member.
+                            </div>
+                            <div v-else class="row">
                                 <div class="col-md-6 mb-3" v-for="type in givingTypes" :key="type.id">
                                     <div class="card h-100">
                                         <div class="card-header">

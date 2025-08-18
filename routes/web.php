@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(static function () {
 
     // Member-specific giving management routes
     Route::get('/members/{member}/givings', [MemberGivingsController::class, 'show'])->name('members.givings');
+    Route::post('/members/{member}/giving-types', [MemberGivingsController::class, 'updateGivingTypes'])->name('members.giving-types.update');
     Route::post('/members/{member}/giving-types/{givingType}/systems', [MemberGivingsController::class, 'updateSystems'])->name('members.giving-types.systems.update');
 
     Route::resource('/positions', PositionsController::class)->names('positions');
