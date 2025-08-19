@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Actions\StoreMemberPaymentAction;
 use App\Data\CreateMemberData;
 use App\Data\CreateMemberPaymentData;
 use App\Data\UpdateMemberData;
-use App\Enums\TransactionState;
 use App\Http\Controllers\Controller;
 use App\Models\FxRateHistory;
 use App\Models\Member;
-use App\Models\Transaction;
 use App\Repositories\CurrencyRepository;
+use App\Repositories\Finance\FxRatesHistoryRepository;
 use App\Repositories\GivingTypeRepository;
 use App\Repositories\MemberRepository;
 use App\Repositories\PositionsRepository;
 use App\Repositories\Structure\BranchesRepository;
-use Brick\Math\BigDecimal;
-use Brick\Math\RoundingMode;
+use App\Repositories\TransactionRepository;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
-use Money\Currencies\ISOCurrencies;
-use Money\Currency;
-use Money\Parser\DecimalMoneyParser;
 
 class MembersController extends Controller
 {
@@ -35,6 +30,9 @@ class MembersController extends Controller
         protected PositionsRepository $positionsRepository,
         protected GivingTypeRepository $tagRepository,
         protected CurrencyRepository $currencyRepository,
+        protected FxRatesHistoryRepository $fxRatesHistoryRepository,
+        protected TransactionRepository $transactionRepository,
+        protected StoreMemberPaymentAction $storeMemberPaymentAction,
     ) {
     }
 
@@ -46,118 +44,15 @@ class MembersController extends Controller
      */
     public function storePayment(CreateMemberPaymentData $data, Member $member): RedirectResponse
     {
-        // Normalize currency code
-        $currencyCode = strtoupper(trim($data->currency_code));
-        $reportingCurrency = strtoupper(config()->string('fx.reporting_currency'));
+        $result = $this->storeMemberPaymentAction->execute($data, $member);
 
-        // Parse entered amount to minor units using moneyphp/money
-        $currencies = new ISOCurrencies();
-        $parser = new DecimalMoneyParser($currencies);
-        $money = $parser->parse($data->amount, new Currency($currencyCode));
-        // Money stores amount as integer of minor units in string form
-        $amountRaw = (int) $money->getAmount();
-
-        // Determine subunits for conversion
-        $originSubunit = $currencies->subunitFor(new Currency($currencyCode));
-        $reportSubunit = $currencies->subunitFor(new Currency($reportingCurrency));
-
-        // Fetch current FX rate from DB (base: reporting -> quote: original currency), then invert for currency->reporting
-        $fxRateToReporting = '1';
-        if ($currencyCode !== $reportingCurrency) {
-            $latest = FxRateHistory::query()
-                ->where('base_currency', $reportingCurrency)
-                ->where('quote_currency', $currencyCode)
-                ->orderByDesc('as_of_hour')
-                ->select(['rate'])
-                ->first();
-
-            if (!$latest) {
-                return redirect()->back()->withErrors(['currency_code' => 'FX rate unavailable for selected currency.']);
-            }
-
-            // fxRateToReporting = 1 / (reporting->quote)
-            $fxRateToReporting = BigDecimal::one()
-                ->dividedBy(BigDecimal::of((string) $latest->rate), 10, RoundingMode::HALF_UP)
-                ->toScale(10, RoundingMode::HALF_UP)
-                ->__toString();
-        } else {
-            $fxRateToReporting = '1.0000000000';
+        if (($result['success'] ?? false) === false) {
+            $message = $result['message'] ?? 'Unable to record payment.';
+            return redirect()->back()->with('error', $message);
         }
 
-        // Compute converted_raw in reporting currency minor units without floating point errors
-        $amountMinor = BigDecimal::of((string) $amountRaw);
-        $originFactor = BigDecimal::of('10')->power($originSubunit);
-        $reportFactor = BigDecimal::of('10')->power($reportSubunit);
-
-        $amountMajor = $amountMinor->dividedBy($originFactor, 16, RoundingMode::DOWN);
-        $amountRepMajor = $amountMajor->multipliedBy(BigDecimal::of($fxRateToReporting));
-        $convertedMinor = $amountRepMajor->multipliedBy($reportFactor)->toScale(0, RoundingMode::HALF_UP);
-        $convertedRaw = (int) (string) $convertedMinor;
-
-        // Determine branch context (ID and currency)
-        $user = auth()->user();
-        $branchId = $user->branch_id;
-
-        $branchCurrency = $user?->branch?->currency;
-        if (!$branchCurrency) {
-            return back()
-                ->with('error', 'A branch currency must be set to be able to record payments.');
-        }
-        $branchCurrency = strtoupper($branchCurrency);
-        $branchSubunit = $currencies->subunitFor(new Currency($branchCurrency));
-
-        // Compute branch_converted_raw (minor units)
-        if ($branchCurrency === $reportingCurrency) {
-            $branchConvertedRaw = $convertedRaw;
-        } elseif ($branchCurrency === $currencyCode) {
-            $branchConvertedRaw = $amountRaw;
-        } else {
-            // Need reporting -> branch (R->B) rate from DB
-            $latestRB = FxRateHistory::query()
-                ->where('base_currency', $reportingCurrency)
-                ->where('quote_currency', $branchCurrency)
-                ->orderByDesc('as_of_hour')
-                ->select(['rate'])
-                ->first();
-
-            if (!$latestRB) {
-                return redirect()->back()->withErrors(['currency_code' => 'FX rate unavailable for reporting->branch conversion.']);
-            }
-
-            $fxCR = BigDecimal::of($fxRateToReporting); // C->R
-            $fxRB = BigDecimal::of((string) $latestRB->rate); // R->B
-            $fxCB = $fxCR->multipliedBy($fxRB); // C->B
-
-            // amountMajor already computed; convert to branch minor units
-            $branchFactor = BigDecimal::of('10')->power($branchSubunit);
-            $amountBranchMajor = $amountMajor->multipliedBy($fxCB);
-            $branchMinor = $amountBranchMajor->multipliedBy($branchFactor)->toScale(0, RoundingMode::HALF_UP);
-            $branchConvertedRaw = (int) (string) $branchMinor;
-        }
-
-        // Persist transaction including branch snapshot
-        Transaction::query()->create([
-            'tx_date' => Carbon::parse($data->transaction_date)->startOfDay(),
-            'member_id' => $member->id,
-            'giving_type_id' => $data->giving_type_id,
-            'giving_type_system_id' => $data->giving_type_system_id,
-            'status' => TransactionState::SUCCESSFUL,
-            'month_paid_for' => $data->month_paid_for,
-            'year_paid_for' => $data->year_paid_for,
-            'amount_raw' => $amountRaw,
-            'currency' => $currencyCode,
-            'fx_rate' => $fxRateToReporting,
-            'reporting_currency' => $reportingCurrency,
-            'converted_raw' => $convertedRaw,
-            'branch_id' => $branchId ?: null,
-            'branch_reporting_currency' => $branchCurrency,
-            'branch_converted_raw' => $branchConvertedRaw,
-            'original_amount_entered' => $data->amount,
-            'original_amount_currency' => $currencyCode,
-        ]);
-
-        return redirect()->route('members.givings', ['member' => $member->id])
-            ->with('success', 'Payment recorded successfully.');
+        $message = $result['message'] ?? 'Payment recorded successfully.';
+        return redirect()->back()->with('success', $message);
     }
 
     /**

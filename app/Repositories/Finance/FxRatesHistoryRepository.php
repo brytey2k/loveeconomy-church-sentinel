@@ -74,4 +74,27 @@ class FxRatesHistoryRepository
 
         return $inserted ? count($rows) : 0;
     }
+
+    /**
+     * Get the latest FX rate for a given base->quote currency pair.
+     * Returns null if no rate exists.
+     *
+     * @param string $baseCurrency
+     * @param string $quoteCurrency
+     */
+    public function getLatestRate(string $baseCurrency, string $quoteCurrency): float|null
+    {
+        $base = strtoupper(trim($baseCurrency));
+        $quote = strtoupper(trim($quoteCurrency));
+
+        if ($base === '' || $quote === '') {
+            return null;
+        }
+
+        return FxRateHistory::query()
+            ->where('base_currency', $base)
+            ->where('quote_currency', $quote)
+            ->orderByDesc('as_of_hour')
+            ->value('rate');
+    }
 }
