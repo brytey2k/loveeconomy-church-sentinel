@@ -109,6 +109,9 @@ class Transaction extends Model
 
     protected $appends = [
         'reporting_amount',
+        'branch_reporting_amount',
+        'status_label',
+        'entered_amount',
     ];
 
     public function member(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -119,6 +122,11 @@ class Transaction extends Model
     public function givingType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(GivingType::class);
+    }
+
+    public function givingTypeSystem(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(GivingTypeSystem::class);
     }
 
     public function getReportingAmountAttribute(): string
@@ -147,4 +155,60 @@ class Transaction extends Model
         return $negative ? ('-' . $result) : $result;
     }
 
+    public function getBranchReportingAmountAttribute(): string
+    {
+        // Convert branch_converted_raw to major units using branch_reporting_currency
+        $currencies = new \Money\Currencies\ISOCurrencies();
+        $currencyCode = $this->branch_reporting_currency ?: $this->reporting_currency;
+        $subunit = $currencies->subunitFor(new \Money\Currency($currencyCode));
+        $minor = (string) ($this->branch_converted_raw ?? 0);
+        $negative = str_starts_with($minor, '-');
+        if ($negative) {
+            $minor = substr($minor, 1);
+        }
+        $minor = ltrim($minor, '0');
+        if ($minor === '') {
+            $minor = '0';
+        }
+        if ($subunit === 0) {
+            $result = $minor;
+        } else {
+            $minor = str_pad($minor, $subunit + 1, '0', STR_PAD_LEFT);
+            $int = substr($minor, 0, -$subunit);
+            $frac = substr($minor, -$subunit);
+            $result = $int . '.' . $frac;
+        }
+        return $negative ? ('-' . $result) : $result;
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->status instanceof TransactionState ? $this->status->label() : (string) $this->status;
+    }
+
+    public function getEnteredAmountAttribute(): string
+    {
+        // Convert amount_raw (minor units) to major units using original currency
+        $currencies = new \Money\Currencies\ISOCurrencies();
+        $currencyCode = $this->currency;
+        $subunit = $currencies->subunitFor(new \Money\Currency($currencyCode));
+        $minor = (string) ($this->amount_raw ?? 0);
+        $negative = str_starts_with($minor, '-');
+        if ($negative) {
+            $minor = substr($minor, 1);
+        }
+        $minor = ltrim($minor, '0');
+        if ($minor === '') {
+            $minor = '0';
+        }
+        if ($subunit === 0) {
+            $result = $minor;
+        } else {
+            $minor = str_pad($minor, $subunit + 1, '0', STR_PAD_LEFT);
+            $int = substr($minor, 0, -$subunit);
+            $frac = substr($minor, -$subunit);
+            $result = $int . '.' . $frac;
+        }
+        return $negative ? ('-' . $result) : $result;
+    }
 }

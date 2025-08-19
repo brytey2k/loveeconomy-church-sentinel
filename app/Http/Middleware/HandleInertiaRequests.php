@@ -52,6 +52,20 @@ class HandleInertiaRequests extends Middleware
                 'name' => $gt->name,
             ])->all();
 
+        // Prepare authenticated user info and store in session if present
+        $authUser = null;
+        if ($request->user()) {
+            $u = $request->user();
+            // Build a sanitized user payload (avoid hidden/sensitive fields)
+            $authUser = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'branch_id' => $u->branch_id ?? null,
+                'stationed_branch_id' => $u->stationed_branch_id ?? null,
+            ];
+        }
+
         return [
             ...parent::share($request),
             'flash' => [
@@ -60,6 +74,10 @@ class HandleInertiaRequests extends Middleware
             ],
             // Available in Vue via usePage().props.navGivingTypes
             'navGivingTypes' => $givingTypes,
+            // Explicitly share the authenticated user
+            'auth' => [
+                'user' => $authUser,
+            ],
         ];
     }
 }

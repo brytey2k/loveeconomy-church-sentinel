@@ -17,7 +17,11 @@ class TransactionsController extends Controller
     public function index(): Response
     {
         $transactions = Transaction::query()
-            ->with(['member:id,first_name,last_name', 'givingType:id,name'])
+            ->with([
+                'member:id,first_name,last_name',
+                'givingType:id,name',
+                'givingTypeSystem:id,name',
+            ])
             ->orderByDesc('tx_date')
             ->orderByDesc('id')
             ->paginate(20);

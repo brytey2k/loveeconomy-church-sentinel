@@ -13,7 +13,7 @@ class CreateUserData extends Data
 {
     public function __construct(
         public int $branch_id,
-        public ?int $stationed_branch_id,
+        public int|null $stationed_branch_id,
         public string $name,
         public string $email,
         public string $password,

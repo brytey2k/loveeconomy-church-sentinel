@@ -4,6 +4,9 @@ import { computed } from 'vue'
 
 const page = usePage()
 const navGivingTypes = computed(() => page.props?.navGivingTypes ?? [])
+
+// Compute the logged-in user's name from Inertia shared props
+const userName = computed(() => page.props?.auth?.user?.name ?? '')
 </script>
 
 <template>
@@ -11,7 +14,7 @@ const navGivingTypes = computed(() => page.props?.navGivingTypes ?? [])
         <!-- Brand Logo -->
         <Link href="/dashboard" class="brand-link">
             <img :src="`/images/logo.png`" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-            <span class="brand-text font-weight-light">AdminLTE 3</span>
+            <span class="brand-text font-weight-light">LEC</span>
         </Link>
 
         <!-- Sidebar -->
@@ -21,7 +24,7 @@ const navGivingTypes = computed(() => page.props?.navGivingTypes ?? [])
                     <img :src="`images/avatar.png`" class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">Alexander Pierce</a>
+                    <a href="#" class="d-block">{{ userName || 'User' }}</a>
                 </div>
             </div>
 
@@ -126,6 +129,12 @@ const navGivingTypes = computed(() => page.props?.navGivingTypes ?? [])
                         <Link href="/giving-types" class="nav-link">
                             <i class="nav-icon fas fa-tags"></i>
                             <p>Giving Types</p>
+                        </Link>
+                    </li>
+                    <li class="nav-item">
+                        <Link href="/payments" class="nav-link">
+                            <i class="nav-icon fas fa-money-bill-wave"></i>
+                            <p>Payments</p>
                         </Link>
                     </li>
 
