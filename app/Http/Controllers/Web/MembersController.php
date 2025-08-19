@@ -5,18 +5,27 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Web;
 
 use App\Data\CreateMemberData;
+use App\Data\CreateMemberPaymentData;
 use App\Data\UpdateMemberData;
+use App\Enums\TransactionState;
 use App\Http\Controllers\Controller;
+use App\Models\FxRateHistory;
 use App\Models\Member;
+use App\Models\Transaction;
+use App\Repositories\CurrencyRepository;
 use App\Repositories\GivingTypeRepository;
 use App\Repositories\MemberRepository;
 use App\Repositories\PositionsRepository;
 use App\Repositories\Structure\BranchesRepository;
-use App\Repositories\CurrencyRepository;
-use App\Models\FxRateHistory;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
+use Money\Currencies\ISOCurrencies;
+use Money\Currency;
+use Money\Parser\DecimalMoneyParser;
 
 class MembersController extends Controller
 {
@@ -30,14 +39,94 @@ class MembersController extends Controller
     }
 
     /**
+     * Store a newly created payment for the given member.
+     *
+     * @param CreateMemberPaymentData $data
+     * @param Member $member
+     */
+    public function storePayment(CreateMemberPaymentData $data, Member $member): RedirectResponse
+    {
+        // Normalize currency code
+        $currencyCode = strtoupper(trim($data->currency_code));
+        $reportingCurrency = strtoupper(config()->string('fx.reporting_currency'));
+
+        // Parse entered amount to minor units using moneyphp/money
+        $currencies = new ISOCurrencies();
+        $parser = new DecimalMoneyParser($currencies);
+        $money = $parser->parse($data->amount, new Currency($currencyCode));
+        // Money stores amount as integer of minor units in string form
+        $amountRaw = (int) $money->getAmount();
+
+        // Determine subunits for conversion
+        $originSubunit = $currencies->subunitFor(new Currency($currencyCode));
+        $reportSubunit = $currencies->subunitFor(new Currency($reportingCurrency));
+
+        // Fetch current FX rate from DB (base: reporting -> quote: original currency), then invert for currency->reporting
+        $fxRateToReporting = '1';
+        if ($currencyCode !== $reportingCurrency) {
+            $latest = FxRateHistory::query()
+                ->where('base_currency', $reportingCurrency)
+                ->where('quote_currency', $currencyCode)
+                ->orderByDesc('as_of_hour')
+                ->select(['rate'])
+                ->first();
+
+            if (!$latest) {
+                return redirect()->back()->withErrors(['currency_code' => 'FX rate unavailable for selected currency.']);
+            }
+
+            // fxRateToReporting = 1 / (reporting->quote)
+            $fxRateToReporting = BigDecimal::one()
+                ->dividedBy(BigDecimal::of((string) $latest->rate), 10, RoundingMode::HALF_UP)
+                ->toScale(10, RoundingMode::HALF_UP)
+                ->__toString();
+        } else {
+            $fxRateToReporting = '1.0000000000';
+        }
+
+        // Compute converted_raw in reporting currency minor units without floating point errors
+        $amountMinor = BigDecimal::of((string) $amountRaw);
+        $originFactor = BigDecimal::of('10')->power($originSubunit);
+        $reportFactor = BigDecimal::of('10')->power($reportSubunit);
+
+        $amountMajor = $amountMinor->dividedBy($originFactor, 16, RoundingMode::DOWN);
+        $amountRepMajor = $amountMajor->multipliedBy(BigDecimal::of($fxRateToReporting));
+        $convertedMinor = $amountRepMajor->multipliedBy($reportFactor)->toScale(0, RoundingMode::HALF_UP);
+        $convertedRaw = (int) (string) $convertedMinor;
+
+        // Persist transaction
+        Transaction::query()->create([
+            'tx_date' => Carbon::parse($data->transaction_date)->startOfDay(),
+            'member_id' => $member->id,
+            'giving_type_id' => $data->giving_type_id,
+            'giving_type_system_id' => $data->giving_type_system_id,
+            'status' => TransactionState::SUCCESSFUL,
+            'month_paid_for' => $data->month_paid_for,
+            'year_paid_for' => $data->year_paid_for,
+            'amount_raw' => $amountRaw,
+            'currency' => $currencyCode,
+            'fx_rate' => $fxRateToReporting,
+            'reporting_currency' => $reportingCurrency,
+            'converted_raw' => $convertedRaw,
+            'original_amount_entered' => $data->amount,
+            'original_amount_currency' => $currencyCode,
+        ]);
+
+        return redirect()->route('members.givings', ['member' => $member->id])
+            ->with('success', 'Payment recorded successfully.');
+    }
+
+    /**
      * Show the form for creating a payment for a specific member.
+     *
+     * @param Member $member
      */
     public function createPayment(Member $member): Response
     {
         $member->load(['givingTypes:id,name,key', 'givingTypeSystems:id,name,giving_type_id']);
 
         // Prepare giving types
-        $givingTypes = $member->givingTypes->map(fn ($gt) => [
+        $givingTypes = $member->givingTypes->map(static fn ($gt) => [
             'id' => $gt->id,
             'name' => $gt->name,
             'key' => $gt->key,
@@ -46,7 +135,7 @@ class MembersController extends Controller
         // Group assigned systems by giving type id
         $systemsByGivingType = [];
         foreach ($member->givingTypeSystems as $sys) {
-            $systemsByGivingType[$sys->giving_type_id] = $systemsByGivingType[$sys->giving_type_id] ?? [];
+            $systemsByGivingType[$sys->giving_type_id] ??= [];
             $systemsByGivingType[$sys->giving_type_id][] = [
                 'id' => $sys->id,
                 'name' => $sys->name,

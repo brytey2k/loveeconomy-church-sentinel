@@ -31,7 +31,7 @@ class UpdateBranchData extends Data
             'level_id' => ['required', 'integer', Rule::exists(Level::class, 'id')],
             'country_id' => ['required', 'integer', Rule::exists(Country::class, 'id')],
             'parent_id' => ['nullable', 'integer', Rule::exists(Branch::class, 'id')],
-                        'currency' => ['required', 'string', 'size:3', Rule::exists(\App\Models\Currency::class, 'short_name')],
+            'currency' => ['required', 'string', 'size:3', Rule::exists(\App\Models\Currency::class, 'short_name')],
         ];
     }
 }

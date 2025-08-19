@@ -61,10 +61,14 @@ const convertedAmount = computed(() => {
   return amt * Number(cur.rate_to_reporting)
 })
 
-// For now, we skip submission per requirements
+import { router } from '@inertiajs/vue3'
+
 function submit() {
-  console.log('Preview payment payload (no submission):', { ...form })
-  alert('Form submission is not implemented yet. This is a preview of your inputs in the console.')
+  const payload = { ...form }
+  // Normalize to strings where needed
+  if (payload.amount != null) payload.amount = String(payload.amount)
+  if (payload.currency_code) payload.currency_code = String(payload.currency_code)
+  router.post(`/members/${props.member.id}/payments`, payload)
 }
 </script>
 
@@ -184,8 +188,8 @@ function submit() {
                   </div>
 
                   <div class="mt-4">
-                    <button type="submit" class="btn btn-primary" :disabled="true" title="Submission disabled for now">
-                      <i class="fas fa-save"></i> Save Payment (Disabled)
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save"></i> Save Payment
                     </button>
                   </div>
                 </form>

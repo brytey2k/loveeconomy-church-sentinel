@@ -34,7 +34,9 @@ class UsersController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Users/Create');
+        return Inertia::render('Users/Create', [
+            'branches' => \App\Models\Branch::orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     /**

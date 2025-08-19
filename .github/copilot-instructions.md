@@ -93,6 +93,8 @@ Route::get('/users', function () {
 ### Controllers & Validation
 - Always create Form Request classes for validation rather than inline validation in controllers. Include both validation rules and custom error messages.
 - Check sibling Form Requests to see if the application uses array or string based validation rules.
+- The project uses Laravel Data (spatie/laravel-data) for input validation, transformation and data transfer objects. Do not create or use Laravel FormRequest classes.
+- When calling `Rule::exists()` or any of those that require a table name, use the model name instead of the table name. For example, use `Rule::exists(User::class)` instead of `Rule::exists('users')`.
 
 ### Queues
 - Use queued jobs for time-consuming operations with the `ShouldQueue` interface.

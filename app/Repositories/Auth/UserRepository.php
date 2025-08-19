@@ -27,7 +27,11 @@ class UserRepository implements UserRepositoryInterface
 
     public function create(CreateUserData $createUserData): User
     {
-        return User::create($createUserData->toArray());
+        $data = $createUserData->toArray();
+        if (!array_key_exists('stationed_branch_id', $data) || $data['stationed_branch_id'] === null) {
+            $data['stationed_branch_id'] = $data['branch_id'];
+        }
+        return User::create($data);
     }
 
     public function update(User $user, UpdateUserData $updateUserData): bool

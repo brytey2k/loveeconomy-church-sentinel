@@ -5,6 +5,8 @@ import Card from "../../Components/Card.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
 
 const form = useForm({
+    branch_id: null,
+    stationed_branch_id: null,
     name: '',
     email: '',
     password: '',
@@ -35,6 +37,44 @@ function saveUser() {
 
                             <form method="post" action="/users" @submit.prevent="saveUser">
                                 <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <select
+                                                    required
+                                                    class="form-control"
+                                                    v-model="form.branch_id"
+                                                    :class="{ 'is-invalid': form.errors.branch_id }"
+                                                >
+                                                    <option :value="null" disabled>Select a branch</option>
+                                                    <option v-for="b in $page.props.branches" :key="b.id" :value="b.id">{{ b.name }}</option>
+                                                </select>
+                                                <span class="error invalid-feedback" v-if="form.errors.branch_id">{{ form.errors.branch_id }}</span>
+                                            </div>
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Stationed Branch (optional)</label>
+                                                <select
+                                                    class="form-control"
+                                                    v-model="form.stationed_branch_id"
+                                                    :class="{ 'is-invalid': form.errors.stationed_branch_id }"
+                                                >
+                                                    <option :value="null">Same as Branch</option>
+                                                    <option v-for="b in $page.props.branches" :key="b.id" :value="b.id">{{ b.name }}</option>
+                                                </select>
+                                                <small class="form-text text-muted">If not selected, we'll use the Branch chosen above.</small>
+                                                <span class="error invalid-feedback" v-if="form.errors.stationed_branch_id">{{ form.errors.stationed_branch_id }}</span>
+                                            </div>
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\TransactionState;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
  * @property int $member_id
- * @property string $type
- * @property string $amount
  * @property int $status
  * @property int $month_paid_for
  * @property int $year_paid_for
@@ -24,7 +23,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereMemberId($value)
@@ -34,7 +32,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereYearPaidFor($value)
  *
@@ -68,10 +65,18 @@ class Transaction extends Model
 {
     protected $table = 'finance.transactions';
 
+    protected function casts(): array
+    {
+        return [
+            'status' => TransactionState::class,
+        ];
+    }
+
     protected $fillable = [
+        'tx_date',
         'member_id',
-        'type',
-        'amount',
+        'giving_type_id',
+        'giving_type_system_id',
         'status',
         'month_paid_for',
         'year_paid_for',
@@ -79,5 +84,53 @@ class Transaction extends Model
         'order_id',
         'payment_type',
         'session_id',
+        'amount_raw',
+        'currency',
+        'fx_rate',
+        'reporting_currency',
+        'converted_raw',
+        'original_amount_entered',
+        'original_amount_currency',
     ];
+
+    protected $appends = [
+        'reporting_amount',
+    ];
+
+    public function member(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Member::class);
+    }
+
+    public function givingType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(GivingType::class);
+    }
+
+    public function getReportingAmountAttribute(): string
+    {
+        // Convert converted_raw (minor units) to string in major units respecting currency subunits
+        $currencies = new \Money\Currencies\ISOCurrencies();
+        $subunit = $currencies->subunitFor(new \Money\Currency($this->reporting_currency));
+        $minor = (string) ($this->converted_raw ?? 0);
+        // Pad and insert decimal point according to subunit
+        $negative = str_starts_with($minor, '-');
+        if ($negative) {
+            $minor = substr($minor, 1);
+        }
+        $minor = ltrim($minor, '0');
+        if ($minor === '') {
+            $minor = '0';
+        }
+        if ($subunit === 0) {
+            $result = $minor;
+        } else {
+            $minor = str_pad($minor, $subunit + 1, '0', STR_PAD_LEFT);
+            $int = substr($minor, 0, -$subunit);
+            $frac = substr($minor, -$subunit);
+            $result = $int . '.' . $frac;
+        }
+        return $negative ? ('-' . $result) : $result;
+    }
+
 }

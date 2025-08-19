@@ -58,6 +58,15 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
+    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Branch::class);
+    }
+
+    public function stationedBranch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Branch::class, 'stationed_branch_id');
+    }
     /** @use HasFactory<UserFactory> */
     use HasFactory;
     use Notifiable;
@@ -76,6 +85,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'branch_id',
+        'stationed_branch_id',
     ];
 
     /**
