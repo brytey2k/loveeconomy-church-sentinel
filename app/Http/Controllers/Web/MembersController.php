@@ -94,7 +94,48 @@ class MembersController extends Controller
         $convertedMinor = $amountRepMajor->multipliedBy($reportFactor)->toScale(0, RoundingMode::HALF_UP);
         $convertedRaw = (int) (string) $convertedMinor;
 
-        // Persist transaction
+        // Determine branch context (ID and currency)
+        $user = auth()->user();
+        $branchId = $user->branch_id;
+
+        $branchCurrency = $user?->branch?->currency;
+        if (!$branchCurrency) {
+            return back()
+                ->with('error', 'A branch currency must be set to be able to record payments.');
+        }
+        $branchCurrency = strtoupper($branchCurrency);
+        $branchSubunit = $currencies->subunitFor(new Currency($branchCurrency));
+
+        // Compute branch_converted_raw (minor units)
+        if ($branchCurrency === $reportingCurrency) {
+            $branchConvertedRaw = $convertedRaw;
+        } elseif ($branchCurrency === $currencyCode) {
+            $branchConvertedRaw = $amountRaw;
+        } else {
+            // Need reporting -> branch (R->B) rate from DB
+            $latestRB = FxRateHistory::query()
+                ->where('base_currency', $reportingCurrency)
+                ->where('quote_currency', $branchCurrency)
+                ->orderByDesc('as_of_hour')
+                ->select(['rate'])
+                ->first();
+
+            if (!$latestRB) {
+                return redirect()->back()->withErrors(['currency_code' => 'FX rate unavailable for reporting->branch conversion.']);
+            }
+
+            $fxCR = BigDecimal::of($fxRateToReporting); // C->R
+            $fxRB = BigDecimal::of((string) $latestRB->rate); // R->B
+            $fxCB = $fxCR->multipliedBy($fxRB); // C->B
+
+            // amountMajor already computed; convert to branch minor units
+            $branchFactor = BigDecimal::of('10')->power($branchSubunit);
+            $amountBranchMajor = $amountMajor->multipliedBy($fxCB);
+            $branchMinor = $amountBranchMajor->multipliedBy($branchFactor)->toScale(0, RoundingMode::HALF_UP);
+            $branchConvertedRaw = (int) (string) $branchMinor;
+        }
+
+        // Persist transaction including branch snapshot
         Transaction::query()->create([
             'tx_date' => Carbon::parse($data->transaction_date)->startOfDay(),
             'member_id' => $member->id,
@@ -108,6 +149,9 @@ class MembersController extends Controller
             'fx_rate' => $fxRateToReporting,
             'reporting_currency' => $reportingCurrency,
             'converted_raw' => $convertedRaw,
+            'branch_id' => $branchId ?: null,
+            'branch_reporting_currency' => $branchCurrency,
+            'branch_converted_raw' => $branchConvertedRaw,
             'original_amount_entered' => $data->amount,
             'original_amount_currency' => $currencyCode,
         ]);
@@ -121,7 +165,7 @@ class MembersController extends Controller
      *
      * @param Member $member
      */
-    public function createPayment(Member $member): Response
+    public function createPayment(Member $member): RedirectResponse|Response
     {
         $member->load(['givingTypes:id,name,key', 'givingTypeSystems:id,name,giving_type_id']);
 
@@ -190,6 +234,30 @@ class MembersController extends Controller
             ];
         }
 
+        // Determine branch reporting currency for the current user
+        $user = auth()->user();
+        if ($user?->branch?->currency === null) {
+            return back()->with('error', 'A branch currency must be set to be able to create payments.');
+        }
+        $branchCurrency = strtoupper($user?->branch?->currency);
+
+        // Compute reporting -> branch rate (R->B) from DB for live preview
+        $reportingToBranchRate = null;
+        if ($branchCurrency === strtoupper($reportingCurrency)) {
+            $reportingToBranchRate = 1.0;
+        } else {
+            $latestRB = FxRateHistory::query()
+                ->where('base_currency', strtoupper($reportingCurrency))
+                ->where('quote_currency', strtoupper($branchCurrency))
+                ->orderByDesc('as_of_hour')
+                ->select(['rate'])
+                ->first();
+            if ($latestRB) {
+                // DB rate is base(R) -> quote(B)
+                $reportingToBranchRate = (float) $latestRB->rate;
+            }
+        }
+
         return Inertia::render('Members/Payments/Create', [
             'member' => [
                 'id' => $member->id,
@@ -199,6 +267,8 @@ class MembersController extends Controller
             'givingTypes' => $givingTypes,
             'systemsByGivingType' => $systemsByGivingType,
             'reportingCurrency' => $reportingCurrency,
+            'branchReportingCurrency' => $branchCurrency,
+            'reportingToBranchRate' => $reportingToBranchRate,
             'currencies' => $currenciesWithRates,
         ]);
     }

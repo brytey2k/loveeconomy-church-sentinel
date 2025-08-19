@@ -11,6 +11,8 @@ const props = defineProps({
   systemsByGivingType: Object,
   currencies: Array,
   reportingCurrency: String,
+  branchReportingCurrency: String,
+  reportingToBranchRate: Number,
 })
 
 const form = reactive({
@@ -57,8 +59,34 @@ const selectedCurrency = computed(() => {
 const convertedAmount = computed(() => {
   const amt = Number(form.amount)
   const cur = selectedCurrency.value
-  if (!cur || !cur.rate_to_reporting || !isFinite(amt)) return null
+  if (!cur || !isFinite(amt)) return null
+  if (!cur.rate_to_reporting) return null
   return amt * Number(cur.rate_to_reporting)
+})
+
+const branchConvertedAmount = computed(() => {
+  const amt = Number(form.amount)
+  const cur = selectedCurrency.value
+  const branchCur = props.branchReportingCurrency
+  const reportingCur = props.reportingCurrency
+  const rToB = props.reportingToBranchRate
+
+  if (!cur || !isFinite(amt) || !branchCur) return null
+
+  // If branch currency equals entered currency => identity
+  if (branchCur === form.currency_code) return amt
+
+  // Compute amount in reporting first (if possible)
+  const toReporting = cur.rate_to_reporting ? (amt * Number(cur.rate_to_reporting)) : null
+  if (toReporting == null) return null
+
+  // If branch currency equals reporting => use reporting amount
+  if (branchCur === reportingCur) return toReporting
+
+  // Otherwise, multiply by reporting->branch rate if available
+  if (rToB) return toReporting * Number(rToB)
+
+  return null
 })
 
 import { router } from '@inertiajs/vue3'
@@ -158,12 +186,19 @@ function submit() {
                     </div>
                   </div>
 
-                  <div v-if="convertedAmount !== null" class="alert alert-info">
+                  <div v-if="convertedAmount !== null || branchConvertedAmount !== null" class="alert alert-info">
                     <strong>Converted:</strong>
-                    {{ Number(form.amount).toFixed(2) }} {{ form.currency_code }} ≈ {{ Number(convertedAmount).toFixed(2) }} {{ reportingCurrency }}
+                    <div>
+                      <div v-if="convertedAmount !== null">
+                        {{ Number(form.amount).toFixed(2) }} {{ form.currency_code }} ≈ {{ Number(convertedAmount).toFixed(2) }} {{ reportingCurrency }} (Reporting)
+                      </div>
+                      <div v-if="branchConvertedAmount !== null">
+                        {{ Number(form.amount).toFixed(2) }} {{ form.currency_code }} ≈ {{ Number(branchConvertedAmount).toFixed(2) }} {{ branchReportingCurrency }} (Branch)
+                      </div>
+                    </div>
                   </div>
 
-                  <div v-if="convertedAmount !== null" class="mt-3">
+                  <div v-if="convertedAmount !== null || branchConvertedAmount !== null" class="mt-3">
                     <h5 class="mb-2">Account Transactions (preview)</h5>
                     <div class="table-responsive">
                       <table class="table table-sm table-bordered">
@@ -178,9 +213,13 @@ function submit() {
                             <td>Original Amount</td>
                             <td class="text-right">{{ Number(form.amount).toFixed(2) }} {{ form.currency_code }}</td>
                           </tr>
-                          <tr>
+                          <tr v-if="convertedAmount !== null">
                             <td>Reporting Currency Amount ({{ reportingCurrency }})</td>
                             <td class="text-right">{{ Number(convertedAmount).toFixed(2) }} {{ reportingCurrency }}</td>
+                          </tr>
+                          <tr v-if="branchConvertedAmount !== null">
+                            <td>Branch Currency Amount ({{ branchReportingCurrency }})</td>
+                            <td class="text-right">{{ Number(branchConvertedAmount).toFixed(2) }} {{ branchReportingCurrency }}</td>
                           </tr>
                         </tbody>
                       </table>

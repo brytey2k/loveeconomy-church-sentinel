@@ -45,21 +45,24 @@ use Umbrellio\LTree\Traits\LTreeModelTrait;
  * @method static Builder<static>|Branch withoutSelf(int $id)
  *
  * @property Carbon|null $deleted_at
- * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, Branch> $ltreeChildren
- * @property-read int|null $ltree_children_count
- * @property-read Branch $ltreeParent
  *
  * @method static Builder<static>|Branch onlyTrashed()
  * @method static Builder<static>|Branch whereDeletedAt($value)
  * @method static Builder<static>|Branch withTrashed()
  * @method static Builder<static>|Branch withoutTrashed()
  *
+ * @property string $currency
+ * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, Branch> $ltreeChildren
+ * @property-read int|null $ltree_children_count
+ * @property-read Branch $ltreeParent
  * @property-read Country $country
  * @property-read Level $level
  * @property-read \Umbrellio\LTree\Collections\LTreeCollection<int, GivingTypeSystem> $givingTypeSystems
  * @property-read int|null $giving_type_systems_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, GivingType> $givingTypes
  * @property-read int|null $giving_types_count
+ *
+ * @method static Builder<static>|Branch whereCurrency($value)
  *
  * @mixin \Eloquent
  */

@@ -59,6 +59,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereGivingTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereGivingTypeSystemId($value)
  *
+ * @property int $branch_id
+ * @property string $branch_reporting_currency
+ * @property int $branch_converted_raw
+ * @property-read string $reporting_amount
+ * @property-read GivingType|null $givingType
+ * @property-read Member|null $member
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereBranchConvertedRaw($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereBranchReportingCurrency($value)
+ *
  * @mixin \Eloquent
  */
 class Transaction extends Model
@@ -89,6 +100,9 @@ class Transaction extends Model
         'fx_rate',
         'reporting_currency',
         'converted_raw',
+        'branch_id',
+        'branch_reporting_currency',
+        'branch_converted_raw',
         'original_amount_entered',
         'original_amount_currency',
     ];
