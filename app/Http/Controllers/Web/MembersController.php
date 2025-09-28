@@ -237,6 +237,74 @@ class MembersController extends Controller
     }
 
     /**
+     * Display the specified member details page with filters and paginated transactions.
+     */
+    public function show(Member $member): Response
+    {
+        // Load basic relations
+        $member->load(['branch:id,name,currency', 'position:id,name', 'givingTypes:id,name,key', 'givingTypeSystems:id,name,giving_type_id']);
+
+        // Prepare giving types for filter dropdown
+        $givingTypes = $member->givingTypes->map(static fn ($gt) => [
+            'id' => $gt->id,
+            'name' => $gt->name,
+            'key' => $gt->key,
+        ])->values();
+
+        // Group assigned systems by giving type id for dependent filter
+        $systemsByGivingType = [];
+        foreach ($member->givingTypeSystems as $sys) {
+            $systemsByGivingType[$sys->giving_type_id] ??= [];
+            $systemsByGivingType[$sys->giving_type_id][] = [
+                'id' => $sys->id,
+                'name' => $sys->name,
+            ];
+        }
+
+        // Filters
+        $givingTypeId = request()->integer('giving_type_id');
+        $systemId = request()->integer('giving_type_system_id');
+        $perPage = max(1, min(100, request()->integer('per_page') ?: 15));
+
+        // Transactions query (for this member only)
+        $transactions = \App\Models\Transaction::query()
+            ->with(['givingType:id,name', 'givingTypeSystem:id,name'])
+            ->where('member_id', $member->id)
+            ->when($givingTypeId, static fn ($q, $val) => $q->where('giving_type_id', $val))
+            ->when($systemId, static fn ($q, $val) => $q->where('giving_type_system_id', $val))
+            ->orderByDesc('tx_date')
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->appends(request()->query());
+
+        return Inertia::render('Members/Show', [
+            'member' => [
+                'id' => $member->id,
+                'first_name' => $member->first_name,
+                'last_name' => $member->last_name,
+                'phone' => $member->phone,
+                'branch' => $member->branch ? [
+                    'id' => $member->branch->id,
+                    'name' => $member->branch->name,
+                    'currency' => $member->branch->currency,
+                ] : null,
+                'position' => $member->position ? [
+                    'id' => $member->position->id,
+                    'name' => $member->position->name,
+                ] : null,
+            ],
+            'givingTypes' => $givingTypes,
+            'systemsByGivingType' => $systemsByGivingType,
+            'transactions' => $transactions,
+            'filters' => [
+                'giving_type_id' => $givingTypeId,
+                'giving_type_system_id' => $systemId,
+                'per_page' => $perPage,
+            ],
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param Member $member

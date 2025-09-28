@@ -2,7 +2,7 @@
 import AuthLayout from "../../../Layouts/AuthLayout.vue";
 import FluidContainerWithRow from "../../../Components/FluidContainerWithRow.vue";
 import Card from "../../../Components/Card.vue";
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage, router } from '@inertiajs/vue3'
 import { reactive, computed } from 'vue'
 
 const props = defineProps({
@@ -14,6 +14,9 @@ const props = defineProps({
   branchReportingCurrency: String,
   reportingToBranchRate: Number,
 })
+
+const page = usePage()
+const errors = computed(() => page.props?.errors ?? {})
 
 const form = reactive({
   giving_type_id: null,
@@ -89,14 +92,27 @@ const branchConvertedAmount = computed(() => {
   return null
 })
 
-import { router } from '@inertiajs/vue3'
+function resetForm() {
+  form.giving_type_id = null
+  form.giving_type_system_id = null
+  form.transaction_date = null
+  form.month_paid_for = null
+  form.year_paid_for = new Date().getFullYear()
+  form.amount = null
+  form.currency_code = null
+}
 
 function submit() {
   const payload = { ...form }
   // Normalize to strings where needed
   if (payload.amount != null) payload.amount = String(payload.amount)
   if (payload.currency_code) payload.currency_code = String(payload.currency_code)
-  router.post(`/members/${props.member.id}/payments`, payload)
+  router.post(`/members/${props.member.id}/payments`, payload, {
+    preserveScroll: true,
+    onSuccess: () => {
+      resetForm()
+    },
+  })
 }
 </script>
 
@@ -119,17 +135,26 @@ function submit() {
             <template #card-body>
               <div class="card-body">
                 <form @submit.prevent="submit" class="space-y-4">
+                  <!-- Error summary -->
+                  <div v-if="Object.keys(errors).length" class="alert alert-danger">
+                    <strong>Please fix the following errors:</strong>
+                    <ul class="mb-0">
+                      <li v-for="(msg, key) in errors" :key="key">{{ msg }}</li>
+                    </ul>
+                  </div>
+
                   <div class="form-group">
                     <label class="block font-medium">Giving Type</label>
-                    <select v-model.number="form.giving_type_id" @change="onGivingTypeChange" class="form-control">
+                    <select v-model.number="form.giving_type_id" @change="onGivingTypeChange" class="form-control" :class="{ 'is-invalid': errors.giving_type_id }">
                       <option value="" disabled selected>Select giving type</option>
                       <option v-for="gt in givingTypes" :key="gt.id" :value="gt.id">{{ gt.name }}</option>
                     </select>
+                    <div v-if="errors.giving_type_id" class="invalid-feedback d-block">{{ errors.giving_type_id }}</div>
                   </div>
 
                   <div class="form-group">
                     <label class="block font-medium">Giving Type System</label>
-                    <select v-model.number="form.giving_type_system_id" class="form-control" :disabled="!form.giving_type_id">
+                    <select v-model.number="form.giving_type_system_id" class="form-control" :disabled="!form.giving_type_id" :class="{ 'is-invalid': errors.giving_type_system_id }">
                       <option value="" disabled selected>
                         {{ form.giving_type_id ? 'Select system' : 'Select a giving type first' }}
                       </option>
@@ -138,35 +163,40 @@ function submit() {
                     <small v-if="form.giving_type_id && systemsForSelectedType.length === 0" class="text-muted">
                       No systems assigned to this member for the selected giving type.
                     </small>
+                    <div v-if="errors.giving_type_system_id" class="invalid-feedback d-block">{{ errors.giving_type_system_id }}</div>
                   </div>
 
                   <div class="form-group">
                     <label class="block font-medium">Transaction Date</label>
-                    <input type="date" v-model="form.transaction_date" class="form-control" />
+                    <input type="date" v-model="form.transaction_date" class="form-control" :class="{ 'is-invalid': errors.transaction_date }" />
+                    <div v-if="errors.transaction_date" class="invalid-feedback d-block">{{ errors.transaction_date }}</div>
                   </div>
 
                   <div class="form-row">
                     <div class="form-group col-md-6">
                       <label class="block font-medium">Month Paid For</label>
-                      <select v-model.number="form.month_paid_for" class="form-control">
+                      <select v-model.number="form.month_paid_for" class="form-control" :class="{ 'is-invalid': errors.month_paid_for }">
                         <option value="" disabled selected>Select month</option>
                         <option v-for="m in months" :key="m.value" :value="m.value">{{ m.label }}</option>
                       </select>
+                      <div v-if="errors.month_paid_for" class="invalid-feedback d-block">{{ errors.month_paid_for }}</div>
                     </div>
                     <div class="form-group col-md-6">
                       <label class="block font-medium">Year Paid For</label>
-                      <input type="number" min="2000" :max="new Date().getFullYear() + 1" v-model.number="form.year_paid_for" class="form-control" />
+                      <input type="number" min="2000" :max="new Date().getFullYear() + 1" v-model.number="form.year_paid_for" class="form-control" :class="{ 'is-invalid': errors.year_paid_for }" />
+                      <div v-if="errors.year_paid_for" class="invalid-feedback d-block">{{ errors.year_paid_for }}</div>
                     </div>
                   </div>
 
                   <div class="form-row">
                     <div class="form-group col-md-6">
                       <label class="block font-medium">Amount</label>
-                      <input type="number" step="0.01" min="0" v-model.number="form.amount" class="form-control" placeholder="0.00" />
+                      <input type="number" step="0.01" min="0" v-model.number="form.amount" class="form-control" placeholder="0.00" :class="{ 'is-invalid': errors.amount }" />
+                      <div v-if="errors.amount" class="invalid-feedback d-block">{{ errors.amount }}</div>
                     </div>
                     <div class="form-group col-md-6">
                       <label class="block font-medium">Currency</label>
-                      <select v-model="form.currency_code" class="form-control">
+                      <select v-model="form.currency_code" class="form-control" :class="{ 'is-invalid': errors.currency_code }">
                         <option value="" disabled selected>Select currency</option>
                         <option
                           v-for="cur in currencies"
@@ -183,6 +213,7 @@ function submit() {
                       <small v-if="selectedCurrency && selectedCurrency.as_of_hour" class="text-muted">
                         Rate as of: {{ new Date(selectedCurrency.as_of_hour).toLocaleString() }}
                       </small>
+                      <div v-if="errors.currency_code" class="invalid-feedback d-block">{{ errors.currency_code }}</div>
                     </div>
                   </div>
 

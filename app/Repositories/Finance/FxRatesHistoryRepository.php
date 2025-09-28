@@ -91,10 +91,12 @@ class FxRatesHistoryRepository
             return null;
         }
 
-        return FxRateHistory::query()
+        $rate = FxRateHistory::query()
             ->where('base_currency', $base)
             ->where('quote_currency', $quote)
             ->orderByDesc('as_of_hour')
             ->value('rate');
+
+        return $rate === null ? null : (float) $rate;
     }
 }

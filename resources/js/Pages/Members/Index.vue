@@ -76,6 +76,9 @@ function deleteMember(memberId) {
                                         <td>{{ member.branch ? member.branch.name : '-' }}</td>
                                         <td>{{ member.position ? member.position.name : '-' }}</td>
                                         <td>
+                                            <Link :href="`/members/${member.id}`" class="btn btn-primary btn-sm mr-2">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </Link>
                                             <Link :href="`/members/${member.id}/givings`" class="btn btn-secondary btn-sm mr-2">
                                                 <i class="fas fa-donate"></i> Manage Giving Types
                                             </Link>

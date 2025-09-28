@@ -85,25 +85,27 @@ function monthName(value) {
         <div class="col-12">
           <Card :with-card-header="true" card-title="Payments">
             <template #card-tools>
-              <Link href="/dashboard" class="btn btn-secondary btn-sm">
+              <Link href="/dashboard" class="btn btn-secondary btn-sm mx-2 my-1">
                 <i class="fas fa-arrow-left" /> Back to Dashboard
               </Link>
             </template>
             <template #card-body>
-              <div class="mb-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Giving Type</label>
-                  <select class="form-control" v-model="state.giving_type_id" @change="onGivingTypeChange">
-                    <option :value="null">All</option>
-                    <option v-for="gt in givingTypes" :key="gt.id" :value="gt.id">{{ gt.name }}</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Giving Type System</label>
-                  <select class="form-control" v-model="state.giving_type_system_id" :disabled="!state.giving_type_id" @change="onSystemChange">
-                    <option :value="null">All</option>
-                    <option v-for="sys in systemsForSelectedType" :key="sys.id" :value="sys.id">{{ sys.name }}</option>
-                  </select>
+              <div class="p-3">
+                <div class="mb-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">Giving Type</label>
+                    <select class="form-control" v-model="state.giving_type_id" @change="onGivingTypeChange">
+                      <option :value="null">All</option>
+                      <option v-for="gt in givingTypes" :key="gt.id" :value="gt.id">{{ gt.name }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">Giving Type System</label>
+                    <select class="form-control" v-model="state.giving_type_system_id" :disabled="!state.giving_type_id" @change="onSystemChange">
+                      <option :value="null">All</option>
+                      <option v-for="sys in systemsForSelectedType" :key="sys.id" :value="sys.id">{{ sys.name }}</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -128,7 +130,12 @@ function monthName(value) {
                     <tr v-for="(t, index) in rows" :key="t.id">
                       <td>{{ (transactions?.from || 1) + index }}</td>
                       <td>{{ t.tx_date }}</td>
-                      <td>{{ t.member ? (t.member.first_name + ' ' + (t.member.last_name || '')) : '' }}</td>
+                      <td>
+                        <Link v-if="t.member" :href="`/members/${t.member.id}`">
+                          {{ t.member.first_name }} {{ t.member.last_name || '' }}
+                        </Link>
+                        <span v-else></span>
+                      </td>
                       <td>{{ t.giving_type ? t.giving_type.name : t.giving_type_id }}</td>
                       <td>{{ t.giving_type_system ? t.giving_type_system.name : '' }}</td>
                       <td class="text-right">{{ t.entered_amount }} {{ t.currency }}</td>
