@@ -3,11 +3,14 @@ import AuthLayout from "../../Layouts/AuthLayout.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
 import Card from "../../Components/Card.vue";
 import Pagination from "../../Components/Pagination.vue";
-import { Link } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
+import { computed, reactive } from 'vue'
 
 const props = defineProps({
   transactions: Object,
+  givingTypes: Array,
+  systemsByGivingType: Object,
+  filters: Object,
 })
 
 const rows = computed(() => {
@@ -15,6 +18,48 @@ const rows = computed(() => {
   // When paginated, Inertia serializes as { data: [...], links: [...], meta: {...} }
   return Array.isArray(props.transactions) ? props.transactions : (props.transactions.data ?? [])
 })
+
+const state = reactive({
+  giving_type_id: props.filters?.giving_type_id || null,
+  giving_type_system_id: props.filters?.giving_type_system_id || null,
+})
+
+// If only system is provided in the URL, infer its giving_type for initial render
+if (state.giving_type_system_id && !state.giving_type_id && props.systemsByGivingType) {
+  for (const [typeId, systems] of Object.entries(props.systemsByGivingType)) {
+    if (Array.isArray(systems) && systems.some(s => s.id === state.giving_type_system_id)) {
+      state.giving_type_id = Number(typeId)
+      break
+    }
+  }
+}
+
+const systemsForSelectedType = computed(() => {
+  if (!state.giving_type_id) return []
+  return props.systemsByGivingType?.[state.giving_type_id] ?? []
+})
+
+function onGivingTypeChange() {
+  // reset system id when giving type changes
+  state.giving_type_system_id = null
+  applyFilters()
+}
+
+function onSystemChange() {
+  applyFilters()
+}
+
+function applyFilters() {
+  const params = {}
+  if (state.giving_type_id) params.giving_type_id = state.giving_type_id
+  if (state.giving_type_system_id) params.giving_type_system_id = state.giving_type_system_id
+
+  router.get('/payments', params, {
+    preserveScroll: true,
+    preserveState: true,
+    replace: true,
+  })
+}
 
 const MONTHS = [
   null,
@@ -45,8 +90,21 @@ function monthName(value) {
               </Link>
             </template>
             <template #card-body>
-              <div>
-                <!-- optional header actions could go here -->
+              <div class="mb-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Giving Type</label>
+                  <select class="form-control" v-model="state.giving_type_id" @change="onGivingTypeChange">
+                    <option :value="null">All</option>
+                    <option v-for="gt in givingTypes" :key="gt.id" :value="gt.id">{{ gt.name }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Giving Type System</label>
+                  <select class="form-control" v-model="state.giving_type_system_id" :disabled="!state.giving_type_id" @change="onSystemChange">
+                    <option :value="null">All</option>
+                    <option v-for="sys in systemsForSelectedType" :key="sys.id" :value="sys.id">{{ sys.name }}</option>
+                  </select>
+                </div>
               </div>
 
               <div class="card-body table-responsive p-0">

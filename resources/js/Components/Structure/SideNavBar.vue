@@ -5,8 +5,14 @@ import { computed } from 'vue'
 const page = usePage()
 const navGivingTypes = computed(() => page.props?.navGivingTypes ?? [])
 
-// Compute the logged-in user's name from Inertia shared props
+// Auth related shared props
 const userName = computed(() => page.props?.auth?.user?.name ?? '')
+const permissions = computed(() => page.props?.auth?.permissions ?? [])
+
+function can(permission) {
+  if (!permission) return true
+  return Array.isArray(permissions.value) && permissions.value.includes(permission)
+}
 </script>
 
 <template>
@@ -77,85 +83,121 @@ const userName = computed(() => page.props?.auth?.user?.name ?? '')
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <Link href="/users" class="nav-link">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>Users</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/roles" class="nav-link">
-                            <i class="nav-icon fas fa-user-shield"></i>
-                            <p>Roles</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/permissions" class="nav-link">
-                            <i class="nav-icon fas fa-key"></i>
-                            <p>Permissions</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/levels" class="nav-link">
-                            <i class="nav-icon fas fa-signal"></i>
-                            <p>Levels</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/branches" class="nav-link">
-                            <i class="nav-icon fas fa-code-branch"></i>
-                            <p>Branches</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/countries" class="nav-link">
-                            <i class="nav-icon fas fa-flag"></i>
-                            <p>Countries</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/members" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Members</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/positions" class="nav-link">
-                            <i class="nav-icon fas fa-briefcase"></i>
-                            <p>Positions</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/giving-types" class="nav-link">
-                            <i class="nav-icon fas fa-tags"></i>
-                            <p>Giving Types</p>
-                        </Link>
-                    </li>
-                    <li class="nav-item">
-                        <Link href="/payments" class="nav-link">
-                            <i class="nav-icon fas fa-money-bill-wave"></i>
-                            <p>Payments</p>
-                        </Link>
-                    </li>
-
-                    <!-- Dynamic Members by Giving Type -->
-                    <li class="nav-item" v-if="navGivingTypes.length">
+                    <li class="nav-item" v-if="can('view users') || can('view roles') || can('view permissions')">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-hand-holding-heart"></i>
+                            <i class="nav-icon fas fa-users-cog"></i>
                             <p>
-                                Members by Giving Type
+                                Auth & Users
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item" v-for="gt in navGivingTypes" :key="gt.id">
-                                <Link :href="`/members?giving_type_id=${gt.id}`" class="nav-link">
+                            <li class="nav-item" v-if="can('view users')">
+                                <Link href="/users" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>{{ gt.name }}</p>
+                                    <p>Users</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-if="can('view roles')">
+                                <Link href="/roles" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Roles</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-if="can('view permissions')">
+                                <Link href="/permissions" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Permissions</p>
                                 </Link>
                             </li>
                         </ul>
                     </li>
+                    <!-- Organization Group -->
+                    <li class="nav-item" v-if="can('view branches') || can('view countries') || can('view levels') || can('view positions')">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-building"></i>
+                            <p>
+                                Organization
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item" v-if="can('view branches')">
+                                <Link href="/branches" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Branches</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-if="can('view countries')">
+                                <Link href="/countries" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Countries</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-if="can('view levels')">
+                                <Link href="/levels" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Levels</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-if="can('view positions')">
+                                <Link href="/positions" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Positions</p>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Members & Giving Group -->
+                    <li class="nav-item" v-if="can('view members') || can('manage giving types') || can('view transactions')">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-hand-holding-usd"></i>
+                            <p>
+                                Members & Giving
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item" v-if="can('view members')">
+                                <Link href="/members" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Members</p>
+                                </Link>
+                            </li>
+                            <!-- Dynamic Members by Giving Type inside group -->
+                            <li class="nav-item" v-if="can('view members') && navGivingTypes.length">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>
+                                        Members by Giving Type
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item" v-for="gt in navGivingTypes" :key="gt.id">
+                                        <Link :href="`/members?giving_type_id=${gt.id}`" class="nav-link">
+                                            <i class="far fa-dot-circle nav-icon"></i>
+                                            <p>{{ gt.name }}</p>
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item" v-if="can('manage giving types')">
+                                <Link href="/giving-types" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Giving Types</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item" v-if="can('view transactions')">
+                                <Link href="/payments" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Payments</p>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
 
                     <li class="nav-item">
                         <Link method="post" href="/logout" class="nav-link" as="button">

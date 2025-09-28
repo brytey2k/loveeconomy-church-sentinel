@@ -3,11 +3,19 @@ import AuthLayout from "../../Layouts/AuthLayout.vue";
 import FluidContainerWithRow from "../../Components/FluidContainerWithRow.vue";
 import Card from "../../Components/Card.vue";
 import Pagination from "../../Components/Pagination.vue";
-import {Link, useForm} from "@inertiajs/vue3";
+import {Link, useForm, usePage} from "@inertiajs/vue3";
+import { computed } from 'vue'
 
 defineProps({
     users: Object,
 })
+
+const page = usePage()
+const permissions = computed(() => page.props?.auth?.permissions ?? [])
+function can(permission) {
+    if (!permission) return true
+    return Array.isArray(permissions.value) && permissions.value.includes(permission)
+}
 
 function deleteUser(userId) {
     if (confirm('Are you sure you want to delete this user?')) {
@@ -71,6 +79,9 @@ function deleteUser(userId) {
                                         <td>
                                             <Link :href="`/users/${user.id}/edit`" class="btn btn-info btn-sm">
                                                 <i class="fas fa-pencil-alt"></i> Edit
+                                            </Link>
+                                            <Link v-if="can('manage users')" :href="`/users/${user.id}/roles`" class="btn btn-warning btn-sm ml-2">
+                                                <i class="fas fa-user-shield"></i> Add Roles
                                             </Link>
                                             <button @click.prevent="deleteUser(user.id)" class="btn btn-danger btn-sm ml-2">
                                                 <i class="fas fa-trash"></i> Delete

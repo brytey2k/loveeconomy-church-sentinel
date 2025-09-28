@@ -34,11 +34,14 @@ Route::middleware(['auth'])->group(static function () {
     Route::resource('/permissions', PermissionsController::class)->names('permissions')
         ->except(['show', 'destroy']);
     Route::resource('/users', UsersController::class)->names('users');
+    Route::get('/users/{user}/roles', [UsersController::class, 'rolesForm'])->name('users.roles-for');
+    Route::post('/users/{user}/roles', [UsersController::class, 'saveRoles'])->name('users.save-roles');
     Route::resource('/levels', LevelsController::class)->names('levels');
     Route::resource('/branches', BranchesController::class)->names('branches');
     Route::resource('/countries', CountriesController::class)->names('countries');
     Route::resource('/currencies', CurrenciesController::class)->names('currencies');
     Route::resource('/members', MembersController::class)->names('members');
+
 
     // Payments
     Route::get('/payments', [App\Http\Controllers\Web\TransactionsController::class, 'index'])->name('payments.index');
@@ -70,3 +73,4 @@ Route::middleware(['auth'])->group(static function () {
         ->names('giving-type-systems')
         ->except(['create']);
 });
+

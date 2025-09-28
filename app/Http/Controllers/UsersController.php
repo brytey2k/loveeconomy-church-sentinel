@@ -19,6 +19,23 @@ class UsersController extends Controller
     ) {
     }
 
+    public function rolesForm(User $user): Response
+    {
+        return Inertia::render('Users/AddRolesToUser', [
+            'user' => $user,
+            'all_roles' => \App\Models\Role::orderBy('name')->get(['id', 'name']),
+            'user_roles' => $user->roles()->get(['id', 'name']),
+        ]);
+    }
+
+    public function saveRoles(User $user, \Illuminate\Http\Request $request): RedirectResponse
+    {
+        $user->syncRoles($request->array('roles'));
+
+        return redirect()->route('users.roles-for', $user)
+            ->with('success', 'Roles updated successfully.');
+    }
+
     /**
      * Display a listing of the resource.
      */

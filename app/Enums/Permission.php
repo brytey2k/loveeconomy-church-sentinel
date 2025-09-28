@@ -47,4 +47,10 @@ enum Permission: string
     case CreateTransactions = 'create transactions';
     case ViewTransactions = 'view transactions';
     case ManageTransactions = 'manage transactions';
+
+    // Settings
+    case ViewSettings = 'view settings';
+    case ManageSettings = 'manage settings';
 }
+
+
